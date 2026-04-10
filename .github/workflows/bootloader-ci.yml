@@ -1,0 +1,40 @@
+name: Bootloader CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-bootloader:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm qemu-system-x86 make coreutils
+
+      - name: Run bootloader validation suite
+        env:
+          QEMU_TIMEOUT_SECONDS: "5"
+        run: make check-all
+
+      - name: Upload debug artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootloader-debug-artifacts
+          path: |
+            build/*.log
+            build/*.bin
+            build/*.img
+          if-no-files-found: ignore
+          retention-days: 7
