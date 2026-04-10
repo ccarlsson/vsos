@@ -88,6 +88,6 @@ This checklist translates `spec.md` into implementation-ready work.
 ## Done Criteria
 
 - [x] KL-T1..KL-T5 pass locally.
-- [ ] CI passes with same canonical test flow. (Pending first GitHub Actions run on remote)
+- [x] CI passes with same canonical test flow.
 - [x] E1 and E2 behaviors are distinct and stable.
 - [x] Spec and implementation constants remain synchronized.
