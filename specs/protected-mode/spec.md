@@ -57,6 +57,19 @@ Before mode switch entry:
 - Kernel image is already loaded at agreed address.
 - Transition code has access to a known stack and memory region for GDT data.
 
+## 5.1 Phase 0 Decisions (Locked)
+
+- Transition location for v1: kernel early transition stub.
+- Selector constants:
+	- `CODE_SEL = 0x08`
+	- `DATA_SEL = 0x10`
+- 32-bit stack top: `ESP = 0x0009FC00`
+- A20 strategy for v1: fast A20 gate via port `0x92` with verification.
+- Marker codes:
+	- success: `PM_OK`
+	- A20 failure: `P1`
+	- transition/GDT failure: `P2`
+
 ## 6. Functional Requirements
 
 ### PM-FR-1 A20 Enable
@@ -193,8 +206,7 @@ Acceptance:
 
 ## 11. Open Decisions
 
-- Exact A20 strategy for v1 (fast A20 gate, keyboard controller fallback, or both)
-- Where protected-mode transition code lives initially (bootloader stage-1 tail vs kernel early stub)
+- Whether to add A20 fallback path (8042 controller) after v1 stabilization
 - Whether to keep flat segmentation only for initial PM milestone
 
 ## 12. Definition of Done

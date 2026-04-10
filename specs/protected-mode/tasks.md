@@ -4,18 +4,18 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Phase 0 - Design Lock
 
-- [ ] Choose transition location:
+- [x] Choose transition location:
   - [ ] bootloader-side transition block
-  - [ ] kernel early transition stub
-- [ ] Finalize selector constants:
-  - [ ] CODE_SEL
-  - [ ] DATA_SEL
-- [ ] Finalize 32-bit stack top address.
-- [ ] Finalize A20 strategy for v1.
-- [ ] Finalize marker strings/codes:
-  - [ ] PM_OK
-  - [ ] P1
-  - [ ] P2
+  - [x] kernel early transition stub
+- [x] Finalize selector constants:
+  - [x] CODE_SEL = 0x08
+  - [x] DATA_SEL = 0x10
+- [x] Finalize 32-bit stack top address. (`ESP = 0x0009FC00`)
+- [x] Finalize A20 strategy for v1. (fast gate via port 0x92 + verify)
+- [x] Finalize marker strings/codes:
+  - [x] PM_OK
+  - [x] P1
+  - [x] P2
 
 ## Phase 1 - Minimal Transition Path
 
