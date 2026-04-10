@@ -1,8 +1,8 @@
 # VSOS
 
-[![Bootloader CI](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/bootloader-ci.yml/badge.svg)](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/bootloader-ci.yml)
+[![Bootloader CI](https://github.com/ccarlsson/vsos/actions/workflows/bootloader-ci.yml/badge.svg)](https://github.com/ccarlsson/vsos/actions/workflows/bootloader-ci.yml)
 
-Replace `YOUR_ORG/YOUR_REPO` with your GitHub repository path after push.
+
 
 Very Simple Operating System is a minimal educational OS project focused on x86 BIOS boot fundamentals.
 
