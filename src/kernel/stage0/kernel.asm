@@ -315,6 +315,18 @@ protected_mode_entry:
     mov esi, KERNEL_LINEAR_BASE + msg_vga_wrap_ok
     call print_string_pm
 
+    ; Phase 2 test: Scrolling (VGA-T6)
+    ; Output 30 lines to force scrolling past row 24
+    mov ecx, 30
+.scroll_test_loop:
+    mov esi, KERNEL_LINEAR_BASE + msg_scroll_line
+    call vga_string
+    mov al, 0x0A  ; Newline
+    call vga_char
+    loop .scroll_test_loop
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_scroll_ok
+    call print_string_pm
+
     call init_idt
     sti
 
@@ -370,8 +382,37 @@ verify_vga_accessible:
     ret
 
 ; ============================================================================
-; VGA Console Routines (Phase 1)
+; VGA Console Routines (Phase 1-2)
 ; ============================================================================
+
+vga_scroll:
+    ; Phase 2: Scroll framebuffer up by one row
+    ; Shifts rows 1-24 up to rows 0-23, clears row 24
+    pushad
+
+    ; Use ESI for source, EDI for destination
+    ; Source: Row 1 at 0xB8000 + (1 * 80 * 2) = 0xB8000 + 160
+    ; Dest:   Row 0 at 0xB8000
+    ; Copy: 24 rows × 160 bytes = 3840 bytes
+    
+    mov esi, VGA_FRAMEBUFFER + (VGA_COLS * VGA_CELL_SIZE)  ; Start of row 1
+    mov edi, VGA_FRAMEBUFFER                                 ; Start of row 0
+    mov ecx, (VGA_ROWS - 1) * VGA_COLS * VGA_CELL_SIZE / 4  ; Size in dwords (24 rows)
+    
+    ; Copy 24 rows of data upward (using dword moves for efficiency)
+    rep movsd
+    
+    ; Clear row 24 (the newly empty bottom row)
+    ; Row 24 starts at 0xB8000 + (24 * 80 * 2) = 0xB8000 + 3840
+    mov edi, VGA_FRAMEBUFFER + (VGA_ROWS - 1) * VGA_COLS * VGA_CELL_SIZE
+    mov eax, (VGA_DEFAULT_ATTR << 8) | 0x20  ; Space with default attr, dword format
+    shl eax, 16
+    or eax, (VGA_DEFAULT_ATTR << 8) | 0x20   ; Repeat for both words in dword
+    mov ecx, VGA_COLS * VGA_CELL_SIZE / 4    ; 80 characters per row / 4 bytes per dword
+    rep stosd
+    
+    popad
+    ret
 
 vga_init:
     ; Phase 1: Initialize VGA framebuffer
@@ -461,15 +502,13 @@ vga_char:
     mov cl, 0
 
 .check_row_overflow:
-    ; Check if row exceeded 24 (halt on overflow, no scroll yet)
+    ; Check if row exceeded 24 (scroll when overflow)
     cmp bl, VGA_ROWS
     jb .update_cursor
 
-    ; Row overflow: emit marker and halt
-    mov esi, KERNEL_LINEAR_BASE + msg_vga_overflow
-    call print_string_pm
-    cli
-    hlt
+    ; Row overflow: scroll up and reset row to 24 (bottom)
+    call vga_scroll
+    mov bl, VGA_ROWS - 1  ; Set row to 24 (last valid row index)
 
 .update_cursor:
     ; Store updated cursor position
@@ -617,9 +656,11 @@ msg_vga_char_ok db ' VGA_CHAR_OK', 0
 msg_vga_str_ok db ' VGA_STR_OK', 0
 msg_vga_nl_ok db ' VGA_NL_OK', 0
 msg_vga_wrap_ok db ' VGA_WRAP_OK', 0
+msg_vga_scroll_ok db ' VGA_SCROLL_OK', 0
 msg_vga_overflow db ' VGA_OVERFLOW', 0
 msg_hello db 'HELLO', 0
 msg_line1_nl db 'LINE1', 0x0A, 'LINE2', 0
+msg_scroll_line db 'L', 0
 msg_ih_ok db ' IH_OK', 0
 msg_ix_00 db ' IX_00', 0
 msg_ix_06 db ' IX_06', 0

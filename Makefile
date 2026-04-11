@@ -15,7 +15,7 @@ DISK_IH_T2_IMG := build/disk-ih-t2.img
 DISK_IH_T3_IMG := build/disk-ih-t3.img
 DISK_IH_T4_IMG := build/disk-ih-t4.img
 
-.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -147,7 +147,10 @@ check-vga-t4: $(DISK_IMG)
 check-vga-t5: $(DISK_IMG)
 	sh tests/vga-console/scripts/check_qemu_vga_t5.sh $(DISK_IMG)
 
-check-vga-all: check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5
+check-vga-t6: $(DISK_IMG)
+	sh tests/vga-console/scripts/check_qemu_vga_t6.sh $(DISK_IMG)
+
+check-vga-all: check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6
 
 check-t1: check-boot
 
