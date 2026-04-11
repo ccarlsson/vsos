@@ -225,16 +225,61 @@ Acceptance:
 - Distinct error markers.
 - Graceful halt or recovery.
 
-## 11. Open Decisions
+## 11. Phase 0 Design Lock
 
-- Whether to use PIC (8259) mode or local APIC mode for timer interrupt.
-  - Decision: Start with PIC mode (default in QEMU, simpler).
-- Whether to implement `int 0x80` (Linux-style syscall) or use a different vector.
-  - Decision: Defer to later phase if needed for user-mode work.
-- Whether to handle nested interrupts / re-entrancy in v1.
-  - Decision: No; assume interrupts disabled during handler execution.
-- Whether to recover from exceptions or always halt.
-  - Decision: Halt for first version; recovery is advanced.
+The following decisions are locked for IH Phase 0 and are now normative for implementation.
+
+### 11.1 IDT Size and Layout
+
+- IDT has 256 entries (vectors 0-255).
+- Entry size is 8 bytes (32-bit interrupt gate).
+- IDT limit is `256 * 8 - 1 = 0x07FF`.
+- IDT is placed in kernel static data and aligned to 8 bytes.
+
+### 11.2 Vector Allocation
+
+- CPU exception vectors remain standard: 0-31.
+- External interrupt vectors use PIC-remapped range: 32-47 (`0x20-0x2F`).
+- Timer IRQ0 uses vector 32 (`0x20`).
+- Initial dedicated handlers are required for vectors:
+  - 0 (divide by zero)
+  - 6 (invalid opcode)
+  - 13 (general protection fault)
+  - 32 (timer/test interrupt)
+- All other vectors point to a default halt-safe handler.
+
+### 11.3 PIC and Interrupt Source
+
+- PIC mode is used (8259 compatible behavior in QEMU).
+- First validation path uses deterministic software trigger `int 0x20`.
+- Hardware timer IRQ validation can be added after the deterministic path is stable.
+
+### 11.4 Handler Entry Strategy
+
+- Use per-vector assembly stubs that dispatch to a shared common handler path.
+- Stubs without CPU-pushed error codes provide a synthetic zero error code to normalize stack handling.
+- Stubs with CPU-pushed error codes preserve the original error code and follow the same common path.
+
+### 11.5 Register Preservation Convention
+
+- Handlers preserve general-purpose registers with `pushad`/`popad`.
+- Handler paths do not modify segment registers in v1.
+- Return from interrupt/exception paths uses `iret` only.
+
+### 11.6 Marker Codes
+
+- Success marker: `IH_OK`.
+- Exception markers:
+  - `IX_00` for vector 0
+  - `IX_06` for vector 6
+  - `IX_13` for vector 13
+- Unknown/default vector marker: `IX_DF` (default-fallback path).
+
+### 11.7 First-Version Exception Policy
+
+- No recovery from exceptions in v1.
+- Exception handlers emit marker and enter `cli` + `hlt` loop.
+- Nested interrupt handling is out of scope for v1.
 
 ## 12. Definition of Done
 

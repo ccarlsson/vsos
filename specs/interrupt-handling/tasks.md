@@ -4,17 +4,18 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ## Phase 0 - Design Lock
 
-- [ ] Decide IDT size and vector allocation.
-- [ ] Define exception vector numbering (0-31 reserved).
-- [ ] Define interrupt vector numbering (32+ for PIC/APIC).
-- [ ] Choose handler entry point strategy (inline, separate section, etc.).
-- [ ] Define register preservation convention in handlers.
-- [ ] Choose test interrupt source (software `int` or PIC timer).
-- [ ] Finalize marker codes:
-  - [ ] IH_OK
-  - [ ] IX_00 (divide by zero)
-  - [ ] IX_06 (invalid opcode)
-  - [ ] IX_13 (general protection fault)
+- [x] Decide IDT size and vector allocation (256 entries, limit `0x07FF`).
+- [x] Define exception vector numbering (0-31 reserved).
+- [x] Define interrupt vector numbering (PIC remap 32-47).
+- [x] Choose handler entry point strategy (per-vector stubs + common handler).
+- [x] Define register preservation convention in handlers (`pushad`/`popad`, `iret`).
+- [x] Choose test interrupt source (deterministic software `int 0x20` first).
+- [x] Finalize marker codes:
+  - [x] IH_OK
+  - [x] IX_00 (divide by zero)
+  - [x] IX_06 (invalid opcode)
+  - [x] IX_13 (general protection fault)
+  - [x] IX_DF (default/fallback vector)
 
 ## Phase 1 - Minimal Interrupt Path (IH-M1)
 

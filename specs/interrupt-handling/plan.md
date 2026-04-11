@@ -41,6 +41,22 @@ Exit criteria:
 
 - No unresolved questions about IDT size, vectors, or handler locations.
 
+Phase 0 locked decisions:
+
+- IDT size: 256 entries (8-byte gates, limit `0x07FF`), 8-byte aligned static table.
+- Vector map:
+  - Exceptions: 0-31
+  - PIC IRQ range: 32-47
+  - Timer IRQ0/test vector: 32 (`0x20`)
+- First implemented handlers: vectors 0, 6, 13, and 32; all others use default safe handler.
+- Handler strategy: per-vector stubs + common handler path.
+- Register convention: preserve GPRs via `pushad`/`popad`; return via `iret`.
+- Test interrupt source for IH-T1: deterministic software `int 0x20` first, hardware timer later.
+- Markers: `IH_OK`, `IX_00`, `IX_06`, `IX_13`, default `IX_DF`.
+- Exception policy (v1): no recovery, emit marker, then halt with `cli` + `hlt` loop.
+
+Status: Complete.
+
 ### Phase 1 - Minimal Interrupt Path (IH-M1)
 
 Goal: Get one interrupt firing and handled.
