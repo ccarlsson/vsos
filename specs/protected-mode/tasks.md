@@ -64,13 +64,13 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ### CI workflow
 
-- [ ] Update CI to execute protected-mode test target(s).
-- [ ] Upload PM debug artifacts on failure.
+- [x] Update CI to execute protected-mode test target(s).
+- [x] Upload PM debug artifacts on failure.
 
 ### Documentation
 
-- [ ] Keep `specs/protected-mode/spec.md` synchronized with implementation.
-- [ ] Document PM test commands and expected markers.
+- [x] Keep `specs/protected-mode/spec.md` synchronized with implementation.
+- [x] Document PM test commands and expected markers.
 
 ## Requirement Traceability Checklist
 
@@ -83,7 +83,7 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Done Criteria
 
-- [ ] PM-T1..PM-T4 pass locally.
-- [ ] CI runs and passes protected-mode tests.
-- [ ] PM_OK/P1/P2 behavior is deterministic.
-- [ ] Transition constants and contracts are documented and synchronized.
+- [x] PM-T1..PM-T4 pass locally.
+- [x] CI runs and passes protected-mode tests.
+- [x] PM_OK/P1/P2 behavior is deterministic.
+- [x] Transition constants and contracts are documented and synchronized.
