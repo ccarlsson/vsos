@@ -67,15 +67,15 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ## Phase 3 - Interrupt and Table Helper Migration
 
-- [ ] Move IDT setup helpers into C.
-- [ ] Keep ISR/exception entry stubs in assembly.
-- [ ] Optionally move exception bookkeeping helpers to C.
-- [ ] Preserve interrupt marker behavior.
+- [x] Move IDT setup helpers into C.
+- [x] Keep ISR/exception entry stubs in assembly.
+- [x] Optionally move exception bookkeeping helpers to C.
+- [x] Preserve interrupt marker behavior.
 
 ## Phase 3 - Validation
 
-- [ ] `make check-ih-all` still passes.
-- [ ] `make check-pm-all` still passes.
+- [x] `make check-ih-all` still passes.
+- [x] `make check-pm-all` still passes.
 
 ## Phase 4 - CI and Developer Workflow
 

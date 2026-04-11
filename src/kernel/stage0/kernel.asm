@@ -31,11 +31,26 @@ IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 %define RM_OFF(sym) (sym - kernel_image_start)
 
 extern kmain
+extern init_idt_c
+extern ih_handle_timer_c
+extern ih_handle_exception_c
 
 global kernel_image_start
 global start
 global pm_main
 global debug_print_pm
+global idt_start
+global idtr
+global isr_default_stub
+global isr_timer_stub
+global isr_exc0_stub
+global isr_exc6_stub
+global isr_exc13_stub
+global ih_seen
+global ih_count
+global last_exc_vector
+global last_exc_error
+global last_exc_eip
 
 SECTION .text.start
 
@@ -286,7 +301,7 @@ protected_mode_entry:
     jmp halt_pm
 
 pm_main:
-    call init_idt
+    call init_idt_c
     sti
 
 %if INTERRUPT_TEST_MODE = 1
@@ -315,52 +330,6 @@ halt_pm:
     hlt
     jmp halt_pm
 
-init_idt:
-    pushad
-
-    xor ecx, ecx
-.fill_default:
-    mov eax, isr_default_stub
-    call set_idt_gate
-    inc ecx
-    cmp ecx, IDT_ENTRY_COUNT
-    jb .fill_default
-
-    mov ecx, 0x20
-    mov eax, isr_timer_stub
-    call set_idt_gate
-
-    mov ecx, 0x00
-    mov eax, isr_exc0_stub
-    call set_idt_gate
-
-    mov ecx, 0x06
-    mov eax, isr_exc6_stub
-    call set_idt_gate
-
-    mov ecx, 0x0D
-    mov eax, isr_exc13_stub
-    call set_idt_gate
-
-    popad
-    lidt [idtr]
-    ret
-
-set_idt_gate:
-    mov edi, idt_start
-    mov ebx, ecx
-    shl ebx, 3
-    add edi, ebx
-
-    mov bx, ax
-    mov [edi + 0], bx
-    mov word [edi + 2], CODE_SEL
-    mov byte [edi + 4], 0
-    mov byte [edi + 5], 0x8E
-    shr eax, 16
-    mov [edi + 6], ax
-    ret
-
 isr_default_stub:
     cli
 .default_halt:
@@ -369,44 +338,41 @@ isr_default_stub:
 
 isr_timer_stub:
     pushad
-    mov byte [ih_seen], 1
-    inc byte [ih_count]
-    mov esi, msg_ih_ok
-    call print_string_pm
+    call ih_handle_timer_c
     popad
     iret
 
 isr_exc0_stub:
     pushad
     mov eax, [esp + 32]
-    mov [last_exc_eip], eax
-    mov dword [last_exc_error], 0
-    mov byte [last_exc_vector], 0x00
-    mov esi, msg_ix_00
-    call print_string_pm
+    push eax
+    push dword 0
+    push dword 0x00
+    call ih_handle_exception_c
+    add esp, 12
     popad
     jmp exception_halt
 
 isr_exc6_stub:
     pushad
     mov eax, [esp + 32]
-    mov [last_exc_eip], eax
-    mov dword [last_exc_error], 0
-    mov byte [last_exc_vector], 0x06
-    mov esi, msg_ix_06
-    call print_string_pm
+    push eax
+    push dword 0
+    push dword 0x06
+    call ih_handle_exception_c
+    add esp, 12
     popad
     jmp exception_halt
 
 isr_exc13_stub:
     pushad
     mov eax, [esp + 36]
-    mov [last_exc_eip], eax
-    mov eax, [esp + 32]
-    mov [last_exc_error], eax
-    mov byte [last_exc_vector], 0x0D
-    mov esi, msg_ix_13
-    call print_string_pm
+    mov edx, [esp + 32]
+    push eax
+    push edx
+    push dword 0x0D
+    call ih_handle_exception_c
+    add esp, 12
     popad
     jmp exception_halt
 

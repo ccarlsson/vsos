@@ -4,13 +4,17 @@ BOOT_INVALID_BIN := build/boot.invalid.bin
 KERNEL_SRC := src/kernel/stage0/kernel.asm
 KERNEL_C_MAIN_SRC := src/kernel/stage1/kmain.c
 KERNEL_C_VGA_SRC := src/kernel/stage1/vga.c
+KERNEL_C_IDT_SRC := src/kernel/stage1/idt.c
+KERNEL_C_IH_SRC := src/kernel/stage1/interrupts.c
 KERNEL_LD_SCRIPT := src/kernel/linker.ld
 KERNEL_BIN := build/kernel.bin
 KERNEL_ELF := build/kernel.elf
 KERNEL_ASM_OBJ := build/kernel.stage0.o
 KERNEL_C_MAIN_OBJ := build/kernel.stage1.o
 KERNEL_C_VGA_OBJ := build/kernel.vga.o
-KERNEL_C_OBJS := $(KERNEL_C_MAIN_OBJ) $(KERNEL_C_VGA_OBJ)
+KERNEL_C_IDT_OBJ := build/kernel.idt.o
+KERNEL_C_IH_OBJ := build/kernel.interrupts.o
+KERNEL_C_OBJS := $(KERNEL_C_MAIN_OBJ) $(KERNEL_C_VGA_OBJ) $(KERNEL_C_IDT_OBJ) $(KERNEL_C_IH_OBJ)
 CC32 ?= gcc
 LD32 ?= ld
 OBJCOPY ?= objcopy
@@ -59,6 +63,14 @@ $(KERNEL_C_MAIN_OBJ): $(KERNEL_C_MAIN_SRC)
 $(KERNEL_C_VGA_OBJ): $(KERNEL_C_VGA_SRC)
 	mkdir -p build
 	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_VGA_OBJ) $(KERNEL_C_VGA_SRC)
+
+$(KERNEL_C_IDT_OBJ): $(KERNEL_C_IDT_SRC)
+	mkdir -p build
+	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_IDT_OBJ) $(KERNEL_C_IDT_SRC)
+
+$(KERNEL_C_IH_OBJ): $(KERNEL_C_IH_SRC)
+	mkdir -p build
+	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_IH_OBJ) $(KERNEL_C_IH_SRC)
 
 $(KERNEL_ASM_OBJ): $(KERNEL_SRC)
 	mkdir -p build
