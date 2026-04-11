@@ -46,20 +46,20 @@ This checklist translates `spec.md` into implementation-ready work.
 ### Error paths
 
 - [x] Route A20 failure to P1.
-- [ ] Route GDT/selector transition failure variant to P2.
-- [ ] Ensure both failure paths halt with `cli` + `hlt` loop.
+- [x] Route GDT/selector transition failure variant to P2.
+- [x] Ensure both failure paths halt with `cli` + `hlt` loop.
 
 ### Validation
 
-- [ ] PM-T2: A20 failure scenario emits P1 and no PM_OK.
-- [ ] PM-T3: transition failure scenario emits P2 and no PM_OK.
+- [x] PM-T2: A20 failure scenario emits P1 and no PM_OK.
+- [x] PM-T3: transition failure scenario emits P2 and no PM_OK.
 
 ## Phase 3 - Reproducibility and CI
 
 ### Local workflow
 
 - [x] Add canonical protected-mode test scripts under `tests/`.
-- [ ] Add make targets for PM tests (`check-pm-t1`, `check-pm-t2`, `check-pm-t3`).
+- [x] Add make targets for PM tests (`check-pm-t1`, `check-pm-t2`, `check-pm-t3`).
 - [x] Add aggregate PM target (`check-pm-all`).
 
 ### CI workflow
@@ -79,7 +79,7 @@ This checklist translates `spec.md` into implementation-ready work.
 - [x] PM-FR-3 satisfied.
 - [x] PM-FR-4 satisfied.
 - [x] PM-FR-5 satisfied.
-- [ ] PM-FR-6 satisfied.
+- [x] PM-FR-6 satisfied.
 
 ## Done Criteria
 

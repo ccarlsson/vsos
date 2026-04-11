@@ -1,11 +1,23 @@
 BITS 16
 ORG 0x0000
 
+%ifndef CODE_SEL
 CODE_SEL equ 0x08
+%endif
+
+%ifndef DATA_SEL
 DATA_SEL equ 0x10
+%endif
+
 PM_STACK_TOP equ 0x0009FC00
 A20_PORT equ 0x92
 KERNEL_LINEAR_BASE equ 0x00010000
+EXPECTED_CODE_SEL equ 0x08
+EXPECTED_DATA_SEL equ 0x10
+
+%ifndef FORCE_A20_FAILURE
+%define FORCE_A20_FAILURE 0
+%endif
 
 jmp short start
 db 'KRNL'
@@ -32,6 +44,9 @@ start:
     call verify_a20
     jc a20_error
 
+    call validate_pm_config
+    jc pm_config_error
+
     lgdt [gdtr]
 
     mov eax, cr0
@@ -49,6 +64,11 @@ a20_error:
     call print_string
     jmp halt
 
+pm_config_error:
+    mov si, msg_p2
+    call print_string
+    jmp halt
+
 halt:
     cli
     hlt
@@ -62,6 +82,11 @@ enable_a20:
     ret
 
 verify_a20:
+%if FORCE_A20_FAILURE
+    stc
+    ret
+%endif
+
     pushf
     cli
     push ax
@@ -104,6 +129,26 @@ verify_a20:
     pop bx
     pop ax
     popf
+    ret
+
+validate_pm_config:
+    mov ax, CODE_SEL
+    cmp ax, EXPECTED_CODE_SEL
+    jne .invalid
+
+    mov ax, DATA_SEL
+    cmp ax, EXPECTED_DATA_SEL
+    jne .invalid
+
+    mov ax, [gdtr]
+    cmp ax, gdt_end - gdt_start - 1
+    jne .invalid
+
+    clc
+    ret
+
+.invalid:
+    stc
     ret
 
 print_hex_byte:
@@ -165,6 +210,7 @@ print_string:
 msg_ok db 'KERNEL_OK', 0
 msg_dl db ' DL=', 0
 msg_p1 db 'P1', 0
+msg_p2 db 'P2', 0
 boot_drive_val db 0
 
 align 8
