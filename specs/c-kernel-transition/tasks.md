@@ -79,18 +79,18 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ## Phase 4 - CI and Developer Workflow
 
-- [ ] Update CI dependencies if required by the chosen C toolchain.
-- [ ] Keep `make check-all` as the aggregate validation command.
-- [ ] Document local build prerequisites.
-- [ ] Document mixed asm + C kernel layout for contributors.
+- [x] Update CI dependencies if required by the chosen C toolchain.
+- [x] Keep `make check-all` as the aggregate validation command.
+- [x] Document local build prerequisites.
+- [x] Document mixed asm + C kernel layout for contributors.
 
 ## Requirement Traceability
 
-- [ ] CK-1 (Assembly shim) -> Phase 1
-- [ ] CK-2 (C kernel entry) -> Phase 1
-- [ ] CK-3 (Build pipeline) -> Phase 1 and Phase 4
-- [ ] CK-4 (ABI contract) -> Phase 0
-- [ ] CK-5 (Incremental migration) -> Phase 2 onward
+- [x] CK-1 (Assembly shim) -> Phase 1
+- [x] CK-2 (C kernel entry) -> Phase 1
+- [x] CK-3 (Build pipeline) -> Phase 1 and Phase 4
+- [x] CK-4 (ABI contract) -> Phase 0
+- [x] CK-5 (Incremental migration) -> Phase 2 onward
 
 ## Notes
 
