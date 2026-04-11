@@ -25,6 +25,10 @@ IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 %define EXCEPTION_TEST 0
 %endif
 
+%ifndef INTERRUPT_TEST_MODE
+%define INTERRUPT_TEST_MODE 0
+%endif
+
 jmp short start
 db 'KRNL'
 
@@ -247,11 +251,21 @@ protected_mode_entry:
     call init_idt
     sti
 
+%if INTERRUPT_TEST_MODE = 1
+    ; Deterministic Phase 3 multi-interrupt path.
+    int 0x20
+    int 0x20
+    int 0x20
+
+    cmp byte [KERNEL_LINEAR_BASE + ih_count], 3
+    jb halt_pm
+%else
     ; Deterministic Phase 1 interrupt path.
     int 0x20
 
     cmp byte [KERNEL_LINEAR_BASE + ih_seen], 1
     jne halt_pm
+%endif
 
 %if EXCEPTION_TEST = 1
     xor edx, edx
@@ -320,6 +334,7 @@ isr_default_stub:
 isr_timer_stub:
     pushad
     mov byte [KERNEL_LINEAR_BASE + ih_seen], 1
+    inc byte [KERNEL_LINEAR_BASE + ih_count]
     mov esi, KERNEL_LINEAR_BASE + msg_ih_ok
     call print_string_pm
     popad
@@ -384,6 +399,7 @@ msg_ix_06 db ' IX_06', 0
 msg_ix_13 db ' IX_13', 0
 
 ih_seen db 0
+ih_count db 0
 last_exc_vector db 0
 align 4
 last_exc_error dd 0

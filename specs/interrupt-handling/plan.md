@@ -149,6 +149,16 @@ Exit criteria:
 
 - IH-T4 passes and CI includes interrupt-handling coverage.
 
+Phase 3 implementation status:
+
+- IH-T4 implemented with deterministic multiple software interrupts (`int 0x20` x3).
+- `check_qemu_ih_t4.sh` validates multiple handler returns by requiring at least 3 `IH_OK` markers.
+- Makefile includes `check-ih-t1`..`check-ih-t4` and `check-ih-all`.
+- GitHub Actions workflow now runs `make check-all check-pm-all check-ih-all`.
+- Interrupt-handling testing reference added in `specs/interrupt-handling/testing.md`.
+
+Status: Complete.
+
 ## 3. Requirement Traceability
 
 - IH-FR-1 -> IDT definition and load tasks.

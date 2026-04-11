@@ -72,36 +72,36 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 - [x] Implement check_qemu_ih_t1.sh (timer/interrupt test).
 - [x] Implement check_qemu_ih_t2.sh (divide-by-zero exception test).
 - [x] Implement check_qemu_ih_t3.sh (invalid-opcode exception test).
-- [ ] Implement check_qemu_ih_t4.sh (multiple interrupts test).
-- [ ] Add make targets:
+- [x] Implement check_qemu_ih_t4.sh (multiple interrupts test).
+- [x] Add make targets:
   - [x] check-ih-t1
   - [x] check-ih-t2
   - [x] check-ih-t3
-  - [ ] check-ih-t4
+  - [x] check-ih-t4
   - [x] check-ih-all
 
 ### CI Workflow
 
-- [ ] Update GitHub Actions workflow to run interrupt-handling tests.
-- [ ] Upload interrupt-handling debug artifacts on failure.
+- [x] Update GitHub Actions workflow to run interrupt-handling tests.
+- [x] Upload interrupt-handling debug artifacts on failure.
 
 ### Documentation
 
-- [ ] Keep `specs/interrupt-handling/spec.md` synchronized with implementation.
-- [ ] Create `specs/interrupt-handling/testing.md` with test commands and expected markers.
+- [x] Keep `specs/interrupt-handling/spec.md` synchronized with implementation.
+- [x] Create `specs/interrupt-handling/testing.md` with test commands and expected markers.
 
 ## Requirement Traceability Checklist
 
-- [ ] IH-FR-1 satisfied.
-- [ ] IH-FR-2 satisfied.
-- [ ] IH-FR-3 satisfied.
+- [x] IH-FR-1 satisfied.
+- [x] IH-FR-2 satisfied.
+- [x] IH-FR-3 satisfied.
 - [x] IH-FR-4 satisfied.
-- [ ] IH-FR-5 satisfied.
-- [ ] IH-FR-6 satisfied.
+- [x] IH-FR-5 satisfied.
+- [x] IH-FR-6 satisfied.
 
 ## Done Criteria
 
-- [ ] IH-T1..IH-T4 pass locally.
+- [x] IH-T1..IH-T4 pass locally.
 - [ ] CI runs and passes interrupt-handling tests.
-- [ ] IH_OK and IX_nn behavior is deterministic.
-- [ ] IDT structure and handler contracts are documented and synchronized.
+- [x] IH_OK and IX_nn behavior is deterministic.
+- [x] IDT structure and handler contracts are documented and synchronized.
