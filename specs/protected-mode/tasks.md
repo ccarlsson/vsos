@@ -21,31 +21,31 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ### A20
 
-- [ ] Implement A20 enable path.
-- [ ] Implement A20 verification check.
+- [x] Implement A20 enable path.
+- [x] Implement A20 verification check.
 
 ### GDT and mode switch
 
-- [ ] Define minimal GDT (null, code, data).
-- [ ] Load GDTR with `lgdt`.
-- [ ] Set `CR0.PE = 1`.
-- [ ] Execute required far jump to 32-bit code selector.
+- [x] Define minimal GDT (null, code, data).
+- [x] Load GDTR with `lgdt`.
+- [x] Set `CR0.PE = 1`.
+- [x] Execute required far jump to 32-bit code selector.
 
 ### 32-bit entry
 
-- [ ] Initialize `DS`, `ES`, `FS`, `GS`, `SS` with data selector.
-- [ ] Initialize `ESP` to documented 32-bit stack top.
-- [ ] Emit `PM_OK` marker over debug channel.
+- [x] Initialize `DS`, `ES`, `FS`, `GS`, `SS` with data selector.
+- [x] Initialize `ESP` to documented 32-bit stack top.
+- [x] Emit `PM_OK` marker over debug channel.
 
-### Validation
+### Failure validation
 
-- [ ] PM-T1: positive transition emits PM_OK.
+- [x] PM-T1: positive transition emits PM_OK.
 
 ## Phase 2 - Failure Paths
 
 ### Error paths
 
-- [ ] Route A20 failure to P1.
+- [x] Route A20 failure to P1.
 - [ ] Route GDT/selector transition failure variant to P2.
 - [ ] Ensure both failure paths halt with `cli` + `hlt` loop.
 
@@ -58,9 +58,9 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ### Local workflow
 
-- [ ] Add canonical protected-mode test scripts under `tests/`.
+- [x] Add canonical protected-mode test scripts under `tests/`.
 - [ ] Add make targets for PM tests (`check-pm-t1`, `check-pm-t2`, `check-pm-t3`).
-- [ ] Add aggregate PM target (`check-pm-all`).
+- [x] Add aggregate PM target (`check-pm-all`).
 
 ### CI workflow
 
@@ -74,11 +74,11 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Requirement Traceability Checklist
 
-- [ ] PM-FR-1 satisfied.
-- [ ] PM-FR-2 satisfied.
-- [ ] PM-FR-3 satisfied.
-- [ ] PM-FR-4 satisfied.
-- [ ] PM-FR-5 satisfied.
+- [x] PM-FR-1 satisfied.
+- [x] PM-FR-2 satisfied.
+- [x] PM-FR-3 satisfied.
+- [x] PM-FR-4 satisfied.
+- [x] PM-FR-5 satisfied.
 - [ ] PM-FR-6 satisfied.
 
 ## Done Criteria

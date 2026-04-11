@@ -5,7 +5,7 @@ KERNEL_SRC := src/kernel/stage0/kernel.asm
 KERNEL_BIN := build/kernel.bin
 DISK_IMG := build/disk.img
 
-.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -46,6 +46,11 @@ check-qemu-t3: $(BOOT_BIN) $(KERNEL_BIN)
 
 check-qemu-t4: $(BOOT_INVALID_BIN) $(KERNEL_BIN)
 	sh tests/bootloader/scripts/check_qemu_t4.sh $(BOOT_INVALID_BIN) $(KERNEL_BIN)
+
+check-pm-t1: $(DISK_IMG)
+	sh tests/protected-mode/scripts/check_qemu_pm_t1.sh $(DISK_IMG)
+
+check-pm-all: check-pm-t1
 
 check-t1: check-boot
 
