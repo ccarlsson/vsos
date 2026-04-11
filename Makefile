@@ -3,6 +3,12 @@ BOOT_BIN := build/boot.bin
 BOOT_INVALID_BIN := build/boot.invalid.bin
 KERNEL_SRC := src/kernel/stage0/kernel.asm
 KERNEL_BIN := build/kernel.bin
+CC32 ?= gcc
+LD32 ?= ld
+OBJCOPY ?= objcopy
+C32_CFLAGS := -m32 -ffreestanding -fno-pic -fno-pie -fno-stack-protector -Wall -Wextra
+C_TOOLCHAIN_PROBE_SRC := tests/c-kernel-transition/probes/freestanding_probe.c
+C_TOOLCHAIN_PROBE_OBJ := build/freestanding_probe.o
 KERNEL_PM_A20FAIL_BIN := build/kernel.pm.a20fail.bin
 KERNEL_PM_BADSEL_BIN := build/kernel.pm.badsel.bin
 KERNEL_IH_DIV0_BIN := build/kernel.ih.div0.bin
@@ -15,7 +21,7 @@ DISK_IH_T2_IMG := build/disk-ih-t2.img
 DISK_IH_T3_IMG := build/disk-ih-t3.img
 DISK_IH_T4_IMG := build/disk-ih-t4.img
 
-.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-c-toolchain check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -88,6 +94,14 @@ $(DISK_IH_T4_IMG): $(BOOT_BIN) $(KERNEL_IH_MULTI_BIN)
 	dd if=$(KERNEL_IH_MULTI_BIN) of=$(DISK_IH_T4_IMG) bs=512 seek=1 conv=notrunc status=none
 
 disk-image: $(DISK_IMG)
+
+check-c-toolchain:
+	mkdir -p build
+	command -v $(CC32) >/dev/null
+	command -v $(LD32) >/dev/null
+	command -v $(OBJCOPY) >/dev/null
+	$(CC32) $(C32_CFLAGS) -c -o $(C_TOOLCHAIN_PROBE_OBJ) $(C_TOOLCHAIN_PROBE_SRC)
+	@echo "PASS: freestanding 32-bit C toolchain verified"
 
 check-boot: $(BOOT_BIN)
 	sh tests/bootloader/scripts/check_boot_sector.sh $(BOOT_BIN)

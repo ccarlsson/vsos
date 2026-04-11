@@ -4,18 +4,21 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ## Phase 0 - Toolchain and ABI Lock
 
-- [ ] Confirm CI and local toolchain can compile freestanding 32-bit C objects.
-- [ ] Define the assembly-to-C entry contract.
-  - [ ] CPU mode at entry.
-  - [ ] Segment register expectations.
-  - [ ] Stack expectations.
-  - [ ] Interrupt state expectations.
-  - [ ] Boot metadata passing convention.
-- [ ] Define linker placement.
-  - [ ] Kernel virtual/linear load address.
-  - [ ] Section layout.
-  - [ ] Raw binary export flow.
-- [ ] Define source layout for mixed asm + C kernel.
+- [x] Confirm CI and local toolchain can compile freestanding 32-bit C objects.
+  - [x] Added `make check-c-toolchain` probe target.
+  - [x] Added CI package installation for GCC/binutils toolchain.
+  - [x] Added a tracked freestanding probe source file.
+- [x] Define the assembly-to-C entry contract.
+  - [x] CPU mode at entry.
+  - [x] Segment register expectations.
+  - [x] Stack expectations.
+  - [x] Interrupt state expectations.
+  - [x] Boot metadata passing convention.
+- [x] Define linker placement.
+  - [x] Kernel virtual/linear load address.
+  - [x] Section layout.
+  - [x] Raw binary export flow.
+- [x] Define source layout for mixed asm + C kernel.
 
 ## Phase 1 - Minimal Mixed-Language Boot
 

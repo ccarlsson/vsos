@@ -82,6 +82,21 @@ The following code becomes eligible for C migration once the boundary exists:
 - Memory/string helper routines.
 - General kernel subsystems that do not depend on raw entry semantics.
 
+### Locked Phase 0 Entry Contract
+
+The initial asm-to-C boundary is locked to the current kernel entry behavior:
+
+- CPU mode at C entry: 32-bit protected mode.
+- Paging state: disabled.
+- Code selector: `CODE_SEL = 0x08`.
+- Data selector: `DATA_SEL = 0x10`.
+- Segment registers on entry: `ds = es = fs = gs = ss = DATA_SEL`.
+- Stack setup before `call kmain`: `esp = PM_STACK_TOP = 0x0009FC00`.
+- Interrupt state at first C entry: interrupts disabled (`IF = 0`).
+- Kernel load base remains `KERNEL_LINEAR_BASE = 0x00010000`.
+
+This means the C entry point can assume a flat 32-bit address space with a valid downward-growing stack and no asynchronous interrupts until the kernel enables them explicitly.
+
 ### Output Artifact Contract
 
 The bootloader contract stays unchanged in the first transition:
@@ -91,6 +106,16 @@ The bootloader contract stays unchanged in the first transition:
 - Bootloader remains unaware of C or ELF internals.
 
 This implies the C build must ultimately emit a raw binary compatible with the current loader.
+
+### Locked Phase 0 Link Model
+
+The first C transition uses the following link model:
+
+- Link target format: ELF32 i386 during intermediate link step.
+- Final boot artifact: flat raw binary produced from the linked image.
+- Final output path: `build/kernel.bin`.
+- Bootloader-facing disk layout remains unchanged.
+- Sections are expected to be laid out contiguously beginning at `0x00010000`.
 
 ## 6. Responsibilities
 
@@ -133,6 +158,11 @@ Define a stable asm-to-C contract covering:
 - Calling convention.
 - Optional boot metadata passing.
 
+For Phase 0, boot metadata passing is locked to the conservative option:
+
+- No register arguments are passed into `kmain` initially.
+- The boot drive remains stored by assembly in kernel memory and can later be wrapped in a C-visible structure.
+
 ### CK-5: Incremental Migration
 
 Support subsystem-by-subsystem migration rather than a full rewrite.
@@ -149,9 +179,10 @@ Recommended initial contract:
 Input:
   CPU in 32-bit protected mode
   Flat segments loaded
-  Stack valid and aligned to a defined policy
-  Interrupt state explicitly defined by shim
-  Optional pointer/register argument for boot info
+  ds = es = fs = gs = ss = DATA_SEL (0x10)
+  esp = PM_STACK_TOP before call into C
+  Interrupts disabled
+  No register arguments passed initially
 
 Output:
   Control either returns to shim or enters kernel halt loop
@@ -184,6 +215,8 @@ src/kernel/stage1/kmain.c           ; first C kernel body
 src/kernel/linker.ld                ; kernel linker script
 include/kernel/*.h                  ; freestanding kernel headers
 ```
+
+Phase 0 locks this layout as the target structure for Phase 1 implementation.
 
 ### Toolchain Requirements
 

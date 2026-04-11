@@ -20,7 +20,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y nasm qemu-system-x86 make coreutils
+          sudo apt-get install -y nasm qemu-system-x86 make coreutils gcc gcc-multilib binutils
+
+      - name: Run C transition toolchain probe
+        run: make check-c-toolchain
 
       - name: Run bootloader, PM, IH, and VGA validation suites
         env:
