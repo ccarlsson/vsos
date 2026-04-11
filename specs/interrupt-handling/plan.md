@@ -110,6 +110,21 @@ Exit criteria:
 
 - IH-T2 and IH-T3 pass.
 
+Phase 2 implementation status:
+
+- Dedicated exception handlers installed for vectors 0, 6, and 13.
+- Exception handlers capture vector id, interrupted EIP, and error code (when present).
+- Marker emission implemented:
+  - `IX_00` for divide-by-zero
+  - `IX_06` for invalid opcode
+  - `IX_13` for general protection fault
+- Exception policy is enforced: `cli` + `hlt` loop after marker emission.
+- Deterministic exception tests added via build variants:
+  - `EXCEPTION_TEST=1` triggers divide-by-zero
+  - `EXCEPTION_TEST=2` triggers invalid opcode (`ud2`)
+
+Status: Complete.
+
 ### Phase 3 - Reproducibility and CI
 
 Goal: Integrate interrupt tests into existing workflow.

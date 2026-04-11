@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-DISK_IMG="${1:-build/disk.img}"
+DISK_IMG="${1:-build/disk-ih-t3.img}"
 TIMEOUT_SECONDS="${QEMU_TIMEOUT_SECONDS:-3}"
 
 if [ ! -f "$DISK_IMG" ]; then
@@ -14,7 +14,7 @@ if ! command -v qemu-system-i386 >/dev/null 2>&1; then
     exit 1
 fi
 
-LOG_FILE="build/qemu-ih-t1-debug.log"
+LOG_FILE="build/qemu-ih-t3-debug.log"
 rm -f "$LOG_FILE"
 
 timeout -k 1s "${TIMEOUT_SECONDS}s" qemu-system-i386 \
@@ -32,11 +32,11 @@ if [ ! -f "$LOG_FILE" ]; then
     exit 1
 fi
 
-if grep -q 'IH_OK' "$LOG_FILE"; then
-    echo "PASS: interrupt handler verified (IH_OK)"
+if grep -q 'IX_06' "$LOG_FILE"; then
+    echo "PASS: invalid-opcode exception handler verified (IX_06)"
     exit 0
 fi
 
-echo "FAIL: interrupt marker IH_OK not detected"
+echo "FAIL: exception marker IX_06 not detected"
 cat "$LOG_FILE"
 exit 1

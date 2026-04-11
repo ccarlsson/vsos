@@ -46,39 +46,39 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ### Exception Handler Framework
 
-- [ ] Implement exception handler stubs for vectors 0, 6, 13.
-- [ ] Preserve exception context:
-  - [ ] Save error code (if present).
-  - [ ] Save interrupted EIP, CS, EFLAGS.
-  - [ ] Optionally: ESP and segment registers.
+- [x] Implement exception handler stubs for vectors 0, 6, 13.
+- [x] Preserve exception context:
+  - [x] Save error code (if present).
+  - [x] Save interrupted EIP, CS, EFLAGS.
+  - [x] Optionally: ESP and segment registers.
 
 ### Error Markers and Recovery
 
-- [ ] Emit `IX_00` when divide-by-zero exception fires.
-- [ ] Emit `IX_06` when invalid-opcode exception fires.
-- [ ] Emit `IX_13` when general-protection-fault exception fires.
-- [ ] Halt in `cli` + `hlt` loop after exception (no recovery).
+- [x] Emit `IX_00` when divide-by-zero exception fires.
+- [x] Emit `IX_06` when invalid-opcode exception fires.
+- [x] Emit `IX_13` when general-protection-fault exception fires.
+- [x] Halt in `cli` + `hlt` loop after exception (no recovery).
 
 ### Validation
 
-- [ ] IH-T2: Trigger divide by zero, handler catches, IX_00 emitted, CPU does not triple-fault.
-- [ ] IH-T3: Execute invalid opcode, handler catches, IX_06 emitted.
+- [x] IH-T2: Trigger divide by zero, handler catches, IX_00 emitted, CPU does not triple-fault.
+- [x] IH-T3: Execute invalid opcode, handler catches, IX_06 emitted.
 
 ## Phase 3 - Reproducibility and CI
 
 ### Local Workflow
 
-- [ ] Create interrupt-handling test scripts under `tests/interrupt-handling/scripts/`.
-- [ ] Implement check_qemu_ih_t1.sh (timer/interrupt test).
-- [ ] Implement check_qemu_ih_t2.sh (divide-by-zero exception test).
-- [ ] Implement check_qemu_ih_t3.sh (invalid-opcode exception test).
+- [x] Create interrupt-handling test scripts under `tests/interrupt-handling/scripts/`.
+- [x] Implement check_qemu_ih_t1.sh (timer/interrupt test).
+- [x] Implement check_qemu_ih_t2.sh (divide-by-zero exception test).
+- [x] Implement check_qemu_ih_t3.sh (invalid-opcode exception test).
 - [ ] Implement check_qemu_ih_t4.sh (multiple interrupts test).
 - [ ] Add make targets:
-  - [ ] check-ih-t1
-  - [ ] check-ih-t2
-  - [ ] check-ih-t3
+  - [x] check-ih-t1
+  - [x] check-ih-t2
+  - [x] check-ih-t3
   - [ ] check-ih-t4
-  - [ ] check-ih-all
+  - [x] check-ih-all
 
 ### CI Workflow
 
@@ -95,7 +95,7 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 - [ ] IH-FR-1 satisfied.
 - [ ] IH-FR-2 satisfied.
 - [ ] IH-FR-3 satisfied.
-- [ ] IH-FR-4 satisfied.
+- [x] IH-FR-4 satisfied.
 - [ ] IH-FR-5 satisfied.
 - [ ] IH-FR-6 satisfied.
 
