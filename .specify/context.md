@@ -11,7 +11,7 @@ Goals:
 Tech:
 
 - x86
-- Assembly + C
+- Assembly + C and/or rust
 - NASM + GCC
 
 Constraints:
