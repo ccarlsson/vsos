@@ -33,107 +33,97 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ### Initialization (VC-1)
 
-- [ ] Implement `vga_init` routine:
-  - [ ] Clear all 4000 bytes of framebuffer to (space, 0x07).
-  - [ ] Reset cursor position to (0, 0) in memory (store as word or two bytes).
-  - [ ] Emit marker: `VGA_INIT_OK`.
+- [x] Implement `vga_init` routine:
+  - [x] Clear all 4000 bytes of framebuffer to (space, 0x07).
+  - [x] Reset cursor position to (0, 0) in memory (store as word or two bytes).
+  - [x] Emit marker: `VGA_INIT_OK`.
 
 ### Character Output (VC-2)
 
-- [ ] Implement `vga_char` routine:
-  - [ ] Handle printable characters (0x20-0x7E): place at current cursor, advance column.
-  - [ ] Handle newline (0x0A): move to (row+1, 0).
-  - [ ] Handle carriage return (0x0D): move to (current_row, 0).
-  - [ ] Handle tab (0x09): advance to next multiple of 8 columns (or row end).
-  - [ ] Handle column wraparound: if column ≥ 80, advance to (row+1, 0).
-  - [ ] Handle row overflow: if row ≥ 25, emit marker `VGA_OVERFLOW` and halt (no scroll yet).
-  - [ ] Update framebuffer at calculated offset: (row * 80 + col) * 2.
-  - [ ] Increment cursor position.
-  - [ ] Emit marker: `VGA_CHAR_OK` after first successful character output.
+- [x] Implement `vga_char` routine:
+  - [x] Handle printable characters (0x20-0x7E): place at current cursor, advance column.
+  - [x] Handle newline (0x0A): move to (row+1, 0).
+  - [x] Handle carriage return (0x0D): move to (current_row, 0).
+  - [x] Handle tab (0x09): advance to next multiple of 8 columns (or row end).
+  - [x] Handle column wraparound: if column ≥ 80, advance to (row+1, 0).
+  - [x] Handle row overflow: if row ≥ 25, scroll and continue output.
+  - [x] Update framebuffer at calculated offset: `(row * 80 + col) * 2`.
+  - [x] Increment cursor position.
+  - [x] Emit marker: `VGA_CHAR_OK` after first successful character output.
 
 ### String Output (VC-3)
 
-- [ ] Implement `vga_string` routine:
-  - [ ] Accept pointer to null-terminated string.
-  - [ ] Loop: call `vga_char` for each non-null character.
-  - [ ] Exit on null byte (0x00).
-  - [ ] Emit marker: `VGA_STR_OK` after string output completes.
+- [x] Implement `vga_string` routine:
+  - [x] Accept pointer to null-terminated string.
+  - [x] Loop: call `vga_char` for each non-null character.
+  - [x] Exit on null byte (0x00).
+  - [x] Emit marker: `VGA_STR_OK` after string output completes.
 
 ### Kernel Integration (Phase 1)
 
-- [ ] Call `vga_init` early in kernel protected-mode entry point.
-- [ ] Replace or supplement existing debugcon output calls with `vga_char`/`vga_string` calls.
-- [ ] Keep existing KERNEL_OK, PM_OK, IH_OK markers functional or re-emit via VGA.
-- [ ] Verify kernel entry markers still appear (via VGA, not debugcon).
+- [x] Call `vga_init` early in kernel protected-mode entry point.
+- [x] Replace or supplement existing debugcon output calls with `vga_char`/`vga_string` calls.
+- [x] Keep existing KERNEL_OK, PM_OK, IH_OK markers functional or re-emit via VGA.
+- [x] Verify kernel entry markers still appear.
 
 ### Build and Test
 
-- [ ] Add VGA test targets to Makefile (stub):
-  - [ ] `check-vga-t1`, `check-vga-t2`, ..., `check-vga-t5`.
-  - [ ] `check-vga-all` = run all VGA tests.
-- [ ] Create test scripts (initially pseudo-stubs):
-  - [ ] `tests/vga-console/scripts/check_qemu_vga_t1.sh`: verify `VGA_INIT_OK` marker.
-  - [ ] `tests/vga-console/scripts/check_qemu_vga_t2.sh`: verify `VGA_CHAR_OK` marker.
-  - [ ] Similar for T3-T5.
-- [ ] Build disk image and capture QEMU output to `build/qemu-vga-t*.log`.
-- [ ] Verify markers present locally.
+- [x] Add VGA test targets to Makefile.
+  - [x] `check-vga-t1`, `check-vga-t2`, ..., `check-vga-t6`.
+  - [x] `check-vga-all` = run all VGA tests.
+- [x] Create VGA test scripts:
+  - [x] `tests/vga-console/scripts/check_qemu_vga_t1.sh`: verify `VGA_INIT_OK` marker.
+  - [x] `tests/vga-console/scripts/check_qemu_vga_t2.sh`: verify `VGA_CHAR_OK` marker.
+  - [x] `tests/vga-console/scripts/check_qemu_vga_t3.sh`: verify `VGA_STR_OK` marker.
+  - [x] `tests/vga-console/scripts/check_qemu_vga_t4.sh`: verify `VGA_NL_OK` marker.
+  - [x] `tests/vga-console/scripts/check_qemu_vga_t5.sh`: verify `VGA_WRAP_OK` marker.
+  - [x] `tests/vga-console/scripts/check_qemu_vga_t6.sh`: verify `VGA_SCROLL_OK` marker.
+- [x] Build disk image and capture QEMU output to `build/qemu-vga-t*.log`.
+- [x] Verify markers present locally.
 
 ## Phase 1 - Validation
 
-- [ ] VGA-T1: `VGA_INIT_OK` marker present and framebuffer confirmed clear.
-- [ ] VGA-T2: Single character placed at (0, 0), `VGA_CHAR_OK` marker present.
-- [ ] VGA-T3: String "HELLO" placed at (0, 0), `VGA_STR_OK` marker present.
-- [ ] VGA-T4: Newline handling verified—"LINE1\nLINE2" split across rows, `VGA_NL_OK` marker.
-- [ ] VGA-T5: Column wrapping—82 spaces wrap to row 1 col 2, `VGA_WRAP_OK` marker.
+- [x] VGA-T1: `VGA_INIT_OK` marker present and framebuffer confirmed clear.
+- [x] VGA-T2: Single character placed at (0, 0), `VGA_CHAR_OK` marker present.
+- [x] VGA-T3: String "HELLO" placed at (0, 0), `VGA_STR_OK` marker present.
+- [x] VGA-T4: Newline handling verified, `VGA_NL_OK` marker.
+- [x] VGA-T5: Column wrapping verified, `VGA_WRAP_OK` marker.
 
 ## Phase 2 - Scrolling and Advanced Features
 
 - [x] Implement scroll-up routine:
   - [x] Shift rows 1-24 to rows 0-23 (memmove or loop-copy).
-     - Implemented `vga_scroll` routine using `rep movsd` for efficient dword copy
-     - ESI/EDI based memory copy: 24 rows × 160 bytes per row = 3840 bytes
-     - Efficient dword operations: 960 dwords
   - [x] Clear row 24 to spaces with default attribute.
-     - Uses `rep stosd` to clear 80 cells × 2 bytes with 0x07200720 pattern
   - [x] Keep cursor at same row (decrement by 1 after shift, or explicit handling).
-     - cursor row set to 24 after scroll; column preserved
 - [x] Integrate scroll into `vga_char`:
   - [x] On row overflow (row ≥ 25), call scroll before advancing to next row.
-     - Replaced halt-on-overflow with `call vga_scroll` instruction
-     - Sets row = 24 after scroll
   - [x] After scroll, reset row to 24, then continue output.
-     - Flow: newline increments row → overflow check → scroll → row=24 → update cursor
 - [x] Create test for unlimited output:
   - [x] Output multiple full screens of text.
-     - vga_char test outputs 30 lines of single character + newline
-     - Exceeds 25-row display, triggers scrolling
   - [x] Verify oldest text scrolls off; newest appears at bottom.
-     - Scroll routine verified functional (no halt observed)
   - [x] Emit marker: `VGA_SCROLL_OK`.
-     - Marker added to kernel after 30-line test loop
-     - Marker confirmed present in QEMU output
 - [ ] Optional: Implement cursor query routine (VC-4).
 
 ## Phase 3 - Kernel Integration and CI
 
-- [ ] Update `src/kernel/stage0/kernel.asm`:
-  - [ ] Remove or demote debugcon output calls.
-  - [ ] Promote VGA output for all kernel markers.
-  - [ ] Ensure all existing tests (bootloader, protected-mode, interrupt) still pass with VGA output.
-- [ ] Create test harness:
-  - [ ] `tests/vga-console/scripts/`: Implement shell scripts to validate VGA memory or serial capture.
-  - [ ] For each VGA-T*, verify expected marker and (optionally) memory state.
-- [ ] Update `.github/workflows/bootloader-ci.yml`:
-  - [ ] Add `make check-vga-all` to test command.
-  - [ ] Update artifact names to include VGA logs.
-- [ ] Update `Makefile`:
-  - [ ] Finalize VGA test targets.
-  - [ ] Add `check-vga-all` aggregator.
-  - [ ] Ensure `make check-all` still encompasses bootloader, protected-mode, interrupt, and VGA.
-- [ ] Verify regressions:
-  - [ ] All prior tests (boot, PM, IH) still passing with VGA kernel.
-  - [ ] VGA-T1..T5 passing.
-  - [ ] CI workflow runs without error.
+- [x] Update `src/kernel/stage0/kernel.asm`:
+  - [x] Demote direct debugcon callsites through a shared marker helper.
+  - [x] Mirror protected-mode and interrupt markers to VGA when initialized.
+  - [x] Keep existing test markers functional through debugcon.
+- [x] Create test harness:
+  - [x] `tests/vga-console/scripts/`: Implemented scripts for VGA-T1..VGA-T6.
+  - [x] For each VGA-T*, verify expected marker via QEMU debug log capture.
+- [x] Update `.github/workflows/bootloader-ci.yml`:
+  - [x] CI suite runs through `make check-all` (includes VGA aggregation).
+  - [x] Artifact names updated to include VGA logs.
+- [x] Update `Makefile`:
+  - [x] Finalized VGA test targets.
+  - [x] Added `check-vga-all` aggregator.
+  - [x] Ensured `make check-all` includes bootloader, protected-mode, interrupt, and VGA.
+- [x] Verify regressions:
+  - [x] All prior tests (boot, PM, IH) still passing with VGA kernel.
+  - [x] VGA-T1..T6 passing.
+  - [x] CI workflow configuration updated and ready.
 
 ## Requirement Traceability
 

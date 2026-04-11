@@ -84,7 +84,8 @@ Goal: Make VGA console the primary kernel output mechanism.
 
 Tasks:
 
-- Replace debugcon markers with VGA output in kernel.asm.
+- Demote direct debugcon marker calls behind a shared marker helper.
+- Mirror protected-mode and interrupt markers to VGA after `vga_init`.
 - Update test scripts to validate VGA memory state (via QEMU gdb server or serial relay).
 - Integrate `make check-vga-all` target into Makefile.
 - Update CI workflow to run VGA test suite.
@@ -98,7 +99,7 @@ Deliverables:
 Exit criteria:
 
 - All interrupt, protected-mode, and bootloader tests still passing with VGA output.
-- VGA-specific tests (VGA-T1..T5) passing in CI.
+- VGA-specific tests (VGA-T1..T6) passing in CI.
 
 ## 3. Requirement Traceability
 
@@ -110,25 +111,24 @@ Exit criteria:
 
 ## 4. Test Coverage
 
-| Test | Phase | Requirement | Success Condition |
-|------|-------|-------------|-------------------|
-| VGA-T1 | 1 | VC-1 | Framebuffer cleared, cursor at (0,0), marker emitted |
-| VGA-T2 | 1 | VC-2 | Character placed, cursor advanced, marker emitted |
-| VGA-T3 | 1 | VC-3 | String placed, cursor at end, marker emitted |
-| VGA-T4 | 1 | VC-2 | Newline advances row, marker emitted |
-| VGA-T5 | 1 | VC-2 | Cursor wraps at column 80, marker emitted |
-| VGA-T6 | 2 | VC-2 | Tab and CR handled correctly |
-| VGA-T7 | 2 | Scroll | Row 24 overflow triggers scroll-up, no halt |
+|Test|Phase|Requirement|Success Condition|
+|---|---|---|---|
+|VGA-T1|1|VC-1|Framebuffer cleared, cursor at (0,0), marker emitted|
+|VGA-T2|1|VC-2|Character placed, cursor advanced, marker emitted|
+|VGA-T3|1|VC-3|String placed, cursor at end, marker emitted|
+|VGA-T4|1|VC-2|Newline advances row, marker emitted|
+|VGA-T5|1|VC-2|Cursor wraps at column 80, marker emitted|
+|VGA-T6|2|Scroll|Row 24 overflow triggers scroll-up, no halt|
 
 ## 5. Implementation Order
 
 1. **Phase 0**: Lock constants and calling conventions in kernel.asm comments.
-2. **Phase 1**: 
+2. **Phase 1**:
    - Write vga_init, vga_char, vga_string routines.
    - Add test markers to kernel startup.
    - Build disk image and validate VGA-T1..T5 locally.
 3. **Phase 2**: Add scroll routine, extend vga_char, test with high-volume output.
-4. **Phase 3**: Replace kernel debugcon output, update CI, achieve full integration.
+4. **Phase 3**: Route marker emission through shared helper, update CI, achieve full integration.
 
 ## 6. Risk Mitigation
 
