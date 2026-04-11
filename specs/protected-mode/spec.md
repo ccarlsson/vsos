@@ -61,14 +61,14 @@ Before mode switch entry:
 
 - Transition location for v1: kernel early transition stub.
 - Selector constants:
-	- `CODE_SEL = 0x08`
-	- `DATA_SEL = 0x10`
+  - `CODE_SEL = 0x08`
+  - `DATA_SEL = 0x10`
 - 32-bit stack top: `ESP = 0x0009FC00`
 - A20 strategy for v1: fast A20 gate via port `0x92` with verification.
 - Marker codes:
-	- success: `PM_OK`
-	- A20 failure: `P1`
-	- transition/GDT failure: `P2`
+  - success: `PM_OK`
+  - A20 failure: `P1`
+  - transition/GDT failure: `P2`
 
 ## 6. Functional Requirements
 

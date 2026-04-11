@@ -98,7 +98,7 @@ Before jump to kernel entrypoint:
 - Preserve boot drive id in `DL`.
 - Jump to `0x1000:0x0000`.
 - Keep behavior deterministic and documented (real mode, known segment/stack
-	assumptions from bootloader spec).
+ assumptions from bootloader spec).
 
 ## 8. Kernel Responsibilities at Entry
 

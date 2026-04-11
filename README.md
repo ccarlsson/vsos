@@ -2,8 +2,6 @@
 
 [![Bootloader CI](https://github.com/ccarlsson/vsos/actions/workflows/bootloader-ci.yml/badge.svg)](https://github.com/ccarlsson/vsos/actions/workflows/bootloader-ci.yml)
 
-
-
 Very Simple Operating System is a minimal educational OS project focused on x86 BIOS boot fundamentals.
 
 ## Goals

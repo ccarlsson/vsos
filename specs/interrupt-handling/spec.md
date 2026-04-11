@@ -148,7 +148,7 @@ Guaranteed by hardware:
 
 ### Interrupt Stack Frame (on entry)
 
-```
+```text
 [ESP+12] EFLAGS
 [ESP+8]  CS
 [ESP+4]  EIP

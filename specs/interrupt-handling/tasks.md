@@ -59,7 +59,7 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 - [x] Emit `IX_13` when general-protection-fault exception fires.
 - [x] Halt in `cli` + `hlt` loop after exception (no recovery).
 
-### Validation
+### Exception Handler Validation
 
 - [x] IH-T2: Trigger divide by zero, handler catches, IX_00 emitted, CPU does not triple-fault.
 - [x] IH-T3: Execute invalid opcode, handler catches, IX_06 emitted.

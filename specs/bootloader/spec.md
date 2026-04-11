@@ -42,8 +42,8 @@ Out of scope (for this module version):
 - Platform: x86 with BIOS-compatible boot
 - Initial mode: 16-bit real mode
 - Toolchain assumptions:
-	- NASM for assembly sources
-	- GCC + linker for kernel binary (loaded artifact)
+  - NASM for assembly sources
+  - GCC + linker for kernel binary (loaded artifact)
 - Runtime target: QEMU for development/testing
 
 ## 5. Inputs and Outputs
@@ -51,13 +51,13 @@ Out of scope (for this module version):
 Inputs:
 
 - Boot disk image with:
-	- Boot sector at LBA 0 (this module)
-	- Kernel payload stored in a predefined contiguous LBA range
+  - Boot sector at LBA 0 (this module)
+  - Kernel payload stored in a predefined contiguous LBA range
 - Build-time constants:
-	- `KERNEL_LOAD_SEGMENT = 0x1000`
-	- `KERNEL_LOAD_OFFSET = 0x0000`
-	- `KERNEL_START_LBA = 1`
-	- `KERNEL_SECTOR_COUNT = 32` (default)
+  - `KERNEL_LOAD_SEGMENT = 0x1000`
+  - `KERNEL_LOAD_OFFSET = 0x0000`
+  - `KERNEL_START_LBA = 1`
+  - `KERNEL_SECTOR_COUNT = 32` (default)
 
 Outputs:
 
@@ -140,15 +140,15 @@ This section must be synchronized with implementation constants:
 
 - Bootloader loaded by BIOS at `0x0000:0x7C00`
 - Stack location:
-	- `STACK_SEGMENT = 0x0000`
-	- `STACK_OFFSET = 0x7A00`
+  - `STACK_SEGMENT = 0x0000`
+  - `STACK_OFFSET = 0x7A00`
 - Kernel load physical address:
-	- `KERNEL_LOAD_SEGMENT = 0x1000`
-	- `KERNEL_LOAD_OFFSET = 0x0000`
-	- `phys = (KERNEL_LOAD_SEGMENT << 4) + KERNEL_LOAD_OFFSET`
-	- `phys = 0x10000`
+  - `KERNEL_LOAD_SEGMENT = 0x1000`
+  - `KERNEL_LOAD_OFFSET = 0x0000`
+  - `phys = (KERNEL_LOAD_SEGMENT << 4) + KERNEL_LOAD_OFFSET`
+  - `phys = 0x10000`
 - Kernel entrypoint: same as load base unless documented otherwise
-	- Entry: `0x1000:0x0000`
+  - Entry: `0x1000:0x0000`
 
 Kernel size policy for stage-1:
 
@@ -163,14 +163,14 @@ The bootloader must document what state is guaranteed at handoff:
 - CPU mode: real mode
 - Interrupt state: disabled
 - Register guarantees:
-	- `DL` contains BIOS boot drive id
-	- `CS:IP = 0x1000:0x0000` at entry
-	- Other general-purpose registers are undefined unless otherwise documented
+  - `DL` contains BIOS boot drive id
+  - `CS:IP = 0x1000:0x0000` at entry
+  - Other general-purpose registers are undefined unless otherwise documented
 - Segment register guarantees:
-	- `DS = 0x0000`
-	- `ES = 0x0000`
-	- `SS = 0x0000`
-	- `SP = 0x7A00`
+  - `DS = 0x0000`
+  - `ES = 0x0000`
+  - `SS = 0x0000`
+  - `SP = 0x7A00`
 
 Kernel side must not assume undocumented state.
 

@@ -51,7 +51,7 @@ This checklist translates `spec.md` into implementation-ready work.
 
 - [x] Ensure both E1 and E2 end in `cli` + `hlt` loop.
 
-### Validation
+### Negative Path Validation
 
 - [x] KL-T3: corrupted kernel sector triggers E1 and no `KERNEL_OK`.
 - [x] KL-T4: invalid config variant triggers E2 and no `KERNEL_OK`.
