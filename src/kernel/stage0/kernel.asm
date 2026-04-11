@@ -17,6 +17,39 @@ EXPECTED_DATA_SEL equ 0x10
 IDT_ENTRY_COUNT equ 256
 IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 
+; VGA Console Constants (Phase 4)
+; ================================
+; VGA text mode framebuffer address (linear, protected mode)
+VGA_FRAMEBUFFER equ 0xB8000
+; VGA text mode dimensions
+VGA_COLS equ 80
+VGA_ROWS equ 25
+; Size of one character cell (char + attribute = 2 bytes)
+VGA_CELL_SIZE equ 2
+; Total framebuffer bytes (80 * 25 * 2)
+VGA_FRAMEBUFFER_SIZE equ VGA_COLS * VGA_ROWS * VGA_CELL_SIZE
+; Format: bits 7-4 = background, bits 3-0 = foreground
+VGA_DEFAULT_ATTR equ 0x07
+
+; VGA Calling Conventions (Phase 4)
+; ==================================
+; vga_char: Output single character
+;   Input:  AL = ASCII character code
+;           (AH or global context) = attribute byte (default 0x07)
+;   Output: Framebuffer updated, cursor advanced
+;   Side effects: Changes cursor position, modifies framebuffer cells
+;
+; vga_string: Output null-terminated string
+;   Input:  ESI = pointer to buffer with null-terminated string
+;   Output: String copied to framebuffer starting at current cursor
+;           Cursor advanced to end of string
+;
+; vga_init: Initialize VGA console
+;   Input:  none
+;   Output: Framebuffer cleared to spaces (0x20) with default attribute (0x07)
+;           Cursor reset to (0, 0)
+;   Side effects: Entire framebuffer overwritten
+
 %ifndef FORCE_A20_FAILURE
 %define FORCE_A20_FAILURE 0
 %endif
@@ -246,7 +279,51 @@ protected_mode_entry:
     mov esp, PM_STACK_TOP
 
     mov esi, KERNEL_LINEAR_BASE + msg_pm_ok
-    call print_string_pm
+    call emit_marker_pm
+
+    ; Phase 1: Initialize VGA console
+    call vga_init
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_init_ok
+    call emit_marker_pm
+
+    ; Phase 1 test markers: output single character and string
+    mov al, 'A'
+    call vga_char
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_char_ok
+    call emit_marker_pm
+
+    mov esi, KERNEL_LINEAR_BASE + msg_hello
+    call vga_string
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_str_ok
+    call emit_marker_pm
+
+    ; Phase 1 test: Newline handling (VGA-T4)
+    mov esi, KERNEL_LINEAR_BASE + msg_line1_nl
+    call vga_string
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_nl_ok
+    call emit_marker_pm
+
+    ; Phase 1 test: Column wrapping (VGA-T5)
+    ; Output 82 spaces to test wrapping from col 79 to col 0 of next row
+    mov al, ' '
+    mov ecx, 82
+.wrap_test_loop:
+    call vga_char
+    loop .wrap_test_loop
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_wrap_ok
+    call emit_marker_pm
+
+    ; Phase 2 test: Scrolling (VGA-T6)
+    ; Output 30 lines to force scrolling past row 24
+    mov ecx, 30
+.scroll_test_loop:
+    mov esi, KERNEL_LINEAR_BASE + msg_scroll_line
+    call vga_string
+    mov al, 0x0A  ; Newline
+    call vga_char
+    loop .scroll_test_loop
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_scroll_ok
+    call emit_marker_pm
 
     call init_idt
     sti
@@ -278,6 +355,185 @@ halt_pm:
     cli
     hlt
     jmp halt_pm
+
+verify_vga_accessible:
+    ; Phase 0: Test 0xB8000 accessibility
+    ; Write a test pattern (space + white-on-black) to first cell
+    ; Then read it back to verify write succeeded.
+    pushad
+
+    mov eax, VGA_FRAMEBUFFER
+    mov word [eax], 0x0720  ; space (0x20) with attr (0x07)
+
+    ; Read back and verify
+    cmp word [eax], 0x0720
+    je .vga_ok
+
+    ; Failed to write/read
+    stc
+    popad
+    ret
+
+.vga_ok:
+    clc
+    popad
+    ret
+
+; ============================================================================
+; VGA Console Routines (Phase 1-2)
+; ============================================================================
+
+vga_scroll:
+    ; Phase 2: Scroll framebuffer up by one row
+    ; Shifts rows 1-24 up to rows 0-23, clears row 24
+    pushad
+
+    ; Use ESI for source, EDI for destination
+    ; Source: Row 1 at 0xB8000 + (1 * 80 * 2) = 0xB8000 + 160
+    ; Dest:   Row 0 at 0xB8000
+    ; Copy: 24 rows × 160 bytes = 3840 bytes
+    
+    mov esi, VGA_FRAMEBUFFER + (VGA_COLS * VGA_CELL_SIZE)  ; Start of row 1
+    mov edi, VGA_FRAMEBUFFER                                 ; Start of row 0
+    mov ecx, (VGA_ROWS - 1) * VGA_COLS * VGA_CELL_SIZE / 4  ; Size in dwords (24 rows)
+    
+    ; Copy 24 rows of data upward (using dword moves for efficiency)
+    rep movsd
+    
+    ; Clear row 24 (the newly empty bottom row)
+    ; Row 24 starts at 0xB8000 + (24 * 80 * 2) = 0xB8000 + 3840
+    mov edi, VGA_FRAMEBUFFER + (VGA_ROWS - 1) * VGA_COLS * VGA_CELL_SIZE
+    mov eax, (VGA_DEFAULT_ATTR << 8) | 0x20  ; Space with default attr, dword format
+    shl eax, 16
+    or eax, (VGA_DEFAULT_ATTR << 8) | 0x20   ; Repeat for both words in dword
+    mov ecx, VGA_COLS * VGA_CELL_SIZE / 4    ; 80 characters per row / 4 bytes per dword
+    rep stosd
+    
+    popad
+    ret
+
+vga_init:
+    ; Phase 1: Initialize VGA framebuffer
+    ; Clear all cells to space (0x20) with default attribute (0x07)
+    ; Reset cursor position to (0, 0)
+    pushad
+
+    mov edi, VGA_FRAMEBUFFER    ; Use EDI for address
+    mov ecx, VGA_FRAMEBUFFER_SIZE / 2  ; Total words to fill
+    mov ax, 0x0720  ; space + default attr, use AX as value
+
+.clear_loop:
+    mov [edi], ax
+    add edi, 2
+    loop .clear_loop
+
+    ; Reset cursor position to (0, 0)
+    mov byte [KERNEL_LINEAR_BASE + vga_row], 0
+    mov byte [KERNEL_LINEAR_BASE + vga_col], 0
+    mov byte [KERNEL_LINEAR_BASE + vga_initialized], 1
+
+    popad
+    ret
+
+vga_char:
+    ; Phase 1: Output single character
+    ; Input:  AL = ASCII character code
+    ; Output: Character placed, cursor advanced
+    ; Side effects: Framebuffer updated, cursor position changed
+    pushad
+
+    ; Get current cursor position
+    movzx ebx, byte [KERNEL_LINEAR_BASE + vga_row]
+    movzx ecx, byte [KERNEL_LINEAR_BASE + vga_col]
+
+    ; Handle special characters
+    cmp al, 0x0A  ; Newline
+    je .handle_newline
+
+    cmp al, 0x0D  ; Carriage return
+    je .handle_cr
+
+    cmp al, 0x09  ; Tab
+    je .handle_tab
+
+    ; Printable character: place at current cursor
+    ; Calculate framebuffer offset: (row * 80 + col) * 2
+    mov eax, ebx
+    mov edx, VGA_COLS
+    mul edx
+    add eax, ecx
+    shl eax, 1
+    add eax, VGA_FRAMEBUFFER
+
+    ; Place character with default attribute
+    mov ah, VGA_DEFAULT_ATTR
+    mov [eax], ax
+
+    ; Advance column
+    inc cl
+
+    jmp .check_wrap
+
+.handle_newline:
+    ; Advance to next row, reset column
+    inc bl
+    mov cl, 0
+    jmp .check_row_overflow
+
+.handle_cr:
+    ; Move column to 0
+    mov cl, 0
+    jmp .check_wrap
+
+.handle_tab:
+    ; Advance to next multiple of 8 columns (or EOL)
+    and cl, 0xF8
+    add cl, 8
+    cmp cl, VGA_COLS
+    jb .check_wrap
+    mov cl, VGA_COLS
+
+.check_wrap:
+    ; Check if column exceeded 79 (wrap to next line)
+    cmp cl, VGA_COLS
+    jb .update_cursor
+    inc bl
+    mov cl, 0
+
+.check_row_overflow:
+    ; Check if row exceeded 24 (scroll when overflow)
+    cmp bl, VGA_ROWS
+    jb .update_cursor
+
+    ; Row overflow: scroll up and reset row to 24 (bottom)
+    call vga_scroll
+    mov bl, VGA_ROWS - 1  ; Set row to 24 (last valid row index)
+
+.update_cursor:
+    ; Store updated cursor position
+    mov [KERNEL_LINEAR_BASE + vga_row], bl
+    mov [KERNEL_LINEAR_BASE + vga_col], cl
+
+    popad
+    ret
+
+vga_string:
+    ; Phase 1: Output null-terminated string
+    ; Input:  ESI = pointer to null-terminated string
+    ; Output: String copied to framebuffer, cursor advanced
+    pushad
+
+.string_loop:
+    lodsb               ; Load byte from [ESI] into AL, increment ESI
+    test al, al         ; Check for null terminator
+    jz .string_done
+
+    call vga_char       ; Output character
+    jmp .string_loop
+
+.string_done:
+    popad
+    ret
 
 init_idt:
     pushad
@@ -336,7 +592,7 @@ isr_timer_stub:
     mov byte [KERNEL_LINEAR_BASE + ih_seen], 1
     inc byte [KERNEL_LINEAR_BASE + ih_count]
     mov esi, KERNEL_LINEAR_BASE + msg_ih_ok
-    call print_string_pm
+    call emit_marker_pm
     popad
     iret
 
@@ -347,7 +603,7 @@ isr_exc0_stub:
     mov dword [KERNEL_LINEAR_BASE + last_exc_error], 0
     mov byte [KERNEL_LINEAR_BASE + last_exc_vector], 0x00
     mov esi, KERNEL_LINEAR_BASE + msg_ix_00
-    call print_string_pm
+    call emit_marker_pm
     popad
     jmp exception_halt
 
@@ -358,7 +614,7 @@ isr_exc6_stub:
     mov dword [KERNEL_LINEAR_BASE + last_exc_error], 0
     mov byte [KERNEL_LINEAR_BASE + last_exc_vector], 0x06
     mov esi, KERNEL_LINEAR_BASE + msg_ix_06
-    call print_string_pm
+    call emit_marker_pm
     popad
     jmp exception_halt
 
@@ -370,7 +626,7 @@ isr_exc13_stub:
     mov [KERNEL_LINEAR_BASE + last_exc_error], eax
     mov byte [KERNEL_LINEAR_BASE + last_exc_vector], 0x0D
     mov esi, KERNEL_LINEAR_BASE + msg_ix_13
-    call print_string_pm
+    call emit_marker_pm
     popad
     jmp exception_halt
 
@@ -392,11 +648,41 @@ print_string_pm:
 .done:
     ret
 
+emit_marker_pm:
+    ; Phase 3: Keep debugcon markers for tests and mirror to VGA when ready.
+    push esi
+    call print_string_pm
+    pop esi
+
+    cmp byte [KERNEL_LINEAR_BASE + vga_initialized], 1
+    jne .skip_vga
+
+    call vga_string
+
+.skip_vga:
+    ret
+
 msg_pm_ok db ' PM_OK', 0
+msg_vga_ok db ' VGA_OK', 0
+msg_vga_init_ok db ' VGA_INIT_OK', 0
+msg_vga_char_ok db ' VGA_CHAR_OK', 0
+msg_vga_str_ok db ' VGA_STR_OK', 0
+msg_vga_nl_ok db ' VGA_NL_OK', 0
+msg_vga_wrap_ok db ' VGA_WRAP_OK', 0
+msg_vga_scroll_ok db ' VGA_SCROLL_OK', 0
+msg_vga_overflow db ' VGA_OVERFLOW', 0
+msg_hello db 'HELLO', 0
+msg_line1_nl db 'LINE1', 0x0A, 'LINE2', 0
+msg_scroll_line db 'L', 0
 msg_ih_ok db ' IH_OK', 0
 msg_ix_00 db ' IX_00', 0
 msg_ix_06 db ' IX_06', 0
 msg_ix_13 db ' IX_13', 0
+
+; VGA Console Cursor State (Phase 1)
+vga_row db 0        ; Current row (0-24)
+vga_col db 0        ; Current column (0-79)
+vga_initialized db 0
 
 ih_seen db 0
 ih_count db 0
