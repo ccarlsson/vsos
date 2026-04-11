@@ -24,33 +24,33 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ### Assembly Shim (CK-1)
 
-- [ ] Split current kernel entry path into a bootstrap shim and implementation boundary.
-- [ ] Add assembly callout to `kmain`.
-- [ ] Preserve current marker emission needed by tests.
+- [x] Split current kernel entry path into a bootstrap shim and implementation boundary.
+- [x] Add assembly callout to `kmain`.
+- [x] Preserve current marker emission needed by tests.
 
 ### C Entry (CK-2)
 
-- [ ] Add freestanding C source file for kernel entry.
-- [ ] Add `kmain` implementation.
-- [ ] Emit a dedicated marker from C entry.
-- [ ] Provide minimal helper declarations for debug/VGA output.
+- [x] Add freestanding C source file for kernel entry.
+- [x] Add `kmain` implementation.
+- [x] Emit a dedicated marker from C entry.
+- [x] Provide minimal helper declarations for debug/VGA output.
 
 ### Build Pipeline (CK-3)
 
-- [ ] Add linker script.
-- [ ] Update Makefile to:
-  - [ ] Assemble NASM sources.
-  - [ ] Compile C sources.
-  - [ ] Link mixed objects.
-  - [ ] Convert linked output to `build/kernel.bin`.
-- [ ] Preserve existing disk image targets.
+- [x] Add linker script.
+- [x] Update Makefile to:
+  - [x] Assemble NASM sources.
+  - [x] Compile C sources.
+  - [x] Link mixed objects.
+  - [x] Convert linked output to `build/kernel.bin`.
+- [x] Preserve existing disk image targets.
 
 ## Phase 1 - Validation
 
-- [ ] CK-T1: C entry marker present.
-- [ ] CK-T2: `PM_OK` still present before or during C entry handoff.
-- [ ] CK-T3: Existing bootloader tests still pass.
-- [ ] CK-T4: Existing kernel handoff test still passes using the raw binary.
+- [x] CK-T1: C entry marker present.
+- [x] CK-T2: `PM_OK` still present before or during C entry handoff.
+- [x] CK-T3: Existing bootloader tests still pass.
+- [x] CK-T4: Existing kernel handoff test still passes using the raw binary.
 
 ## Phase 2 - First Subsystem Migration
 
