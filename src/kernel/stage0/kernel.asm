@@ -14,6 +14,8 @@ A20_PORT equ 0x92
 KERNEL_LINEAR_BASE equ 0x00010000
 EXPECTED_CODE_SEL equ 0x08
 EXPECTED_DATA_SEL equ 0x10
+IDT_ENTRY_COUNT equ 256
+IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 
 %ifndef FORCE_A20_FAILURE
 %define FORCE_A20_FAILURE 0
@@ -238,10 +240,67 @@ protected_mode_entry:
     mov esi, KERNEL_LINEAR_BASE + msg_pm_ok
     call print_string_pm
 
+    call init_idt
+    sti
+
+    ; Deterministic Phase 1 interrupt path.
+    int 0x20
+
+    cmp byte [KERNEL_LINEAR_BASE + ih_seen], 1
+    jne halt_pm
+
 halt_pm:
     cli
     hlt
     jmp halt_pm
+
+init_idt:
+    pushad
+
+    xor ecx, ecx
+.fill_default:
+    mov eax, KERNEL_LINEAR_BASE + isr_default_stub
+    call set_idt_gate
+    inc ecx
+    cmp ecx, IDT_ENTRY_COUNT
+    jb .fill_default
+
+    mov ecx, 0x20
+    mov eax, KERNEL_LINEAR_BASE + isr_timer_stub
+    call set_idt_gate
+
+    popad
+    lidt [KERNEL_LINEAR_BASE + idtr]
+    ret
+
+set_idt_gate:
+    mov edi, KERNEL_LINEAR_BASE + idt_start
+    mov ebx, ecx
+    shl ebx, 3
+    add edi, ebx
+
+    mov bx, ax
+    mov [edi + 0], bx
+    mov word [edi + 2], CODE_SEL
+    mov byte [edi + 4], 0
+    mov byte [edi + 5], 0x8E
+    shr eax, 16
+    mov [edi + 6], ax
+    ret
+
+isr_default_stub:
+    cli
+.default_halt:
+    hlt
+    jmp .default_halt
+
+isr_timer_stub:
+    pushad
+    mov byte [KERNEL_LINEAR_BASE + ih_seen], 1
+    mov esi, KERNEL_LINEAR_BASE + msg_ih_ok
+    call print_string_pm
+    popad
+    iret
 
 print_string_pm:
     lodsb
@@ -256,3 +315,15 @@ print_string_pm:
     ret
 
 msg_pm_ok db ' PM_OK', 0
+msg_ih_ok db ' IH_OK', 0
+
+ih_seen db 0
+align 8
+
+idt_start:
+    times IDT_ENTRY_COUNT dq 0
+idt_end:
+
+idtr:
+    dw IDT_LIMIT
+    dd KERNEL_LINEAR_BASE + idt_start

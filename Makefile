@@ -9,7 +9,7 @@ DISK_IMG := build/disk.img
 DISK_PM_T2_IMG := build/disk-pm-t2.img
 DISK_PM_T3_IMG := build/disk-pm-t3.img
 
-.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -81,6 +81,11 @@ check-pm-t3: $(DISK_PM_T3_IMG)
 	sh tests/protected-mode/scripts/check_qemu_pm_t3.sh $(DISK_PM_T3_IMG)
 
 check-pm-all: check-pm-t1 check-pm-t2 check-pm-t3
+
+check-ih-t1: $(DISK_IMG)
+	sh tests/interrupt-handling/scripts/check_qemu_ih_t1.sh $(DISK_IMG)
+
+check-ih-all: check-ih-t1
 
 check-t1: check-boot
 

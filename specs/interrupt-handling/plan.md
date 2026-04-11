@@ -80,6 +80,16 @@ Exit criteria:
 
 - IH-T1 passes.
 
+Phase 1 implementation status:
+
+- IDT table allocated in kernel static data (256 entries, 8-byte gates).
+- `init_idt` sets default gates and vector 32 gate, then executes `lidt`.
+- Deterministic validation uses software `int 0x20`.
+- Vector 32 handler preserves GPR state, emits `IH_OK`, and returns with `iret`.
+- Interrupts enabled with `sti` only after IDT initialization.
+
+Status: Complete.
+
 ### Phase 2 - Exception Handlers (IH-M2)
 
 Goal: Trap and handle CPU exceptions.

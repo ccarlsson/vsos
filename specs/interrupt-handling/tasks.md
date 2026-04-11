@@ -21,26 +21,26 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ### IDT Setup
 
-- [ ] Allocate IDT structure in kernel memory.
-- [ ] Define IDT entry descriptor format (gate type, segment selector, offset, DPL, present bit).
-- [ ] Implement IDT load routine using `lidt`.
+- [x] Allocate IDT structure in kernel memory.
+- [x] Define IDT entry descriptor format (gate type, segment selector, offset, DPL, present bit).
+- [x] Implement IDT load routine using `lidt`.
 
 ### Handler Implementation
 
-- [ ] Create timer/test interrupt handler routine.
-- [ ] Save general-purpose registers on entry (push eax, ecx, edx, ebx, etc.).
-- [ ] Restore registers before return (pop in reverse order).
-- [ ] Verify stack frame layout (error code, EIP, CS, EFLAGS).
+- [x] Create timer/test interrupt handler routine.
+- [x] Save general-purpose registers on entry (push eax, ecx, edx, ebx, etc.).
+- [x] Restore registers before return (pop in reverse order).
+- [x] Verify stack frame layout (error code, EIP, CS, EFLAGS).
 
 ### Interrupt Enable and Markers
 
-- [ ] Execute `sti` to enable interrupts after IDT load.
-- [ ] Emit `IH_OK` marker to debug port on successful handler execution.
-- [ ] Disable interrupts with `cli` before halt (if needed).
+- [x] Execute `sti` to enable interrupts after IDT load.
+- [x] Emit `IH_OK` marker to debug port on successful handler execution.
+- [x] Disable interrupts with `cli` before halt (if needed).
 
 ### Validation
 
-- [ ] IH-T1: IDT loads, timer interrupt fires, IH_OK emitted, handler returns.
+- [x] IH-T1: IDT loads, software interrupt `int 0x20` fires, IH_OK emitted, handler returns.
 
 ## Phase 2 - Exception Handlers (IH-M2)
 
