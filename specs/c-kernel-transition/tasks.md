@@ -55,15 +55,15 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 ## Phase 2 - First Subsystem Migration
 
 - [ ] Select first subsystem for migration.
-  - [ ] Recommended: VGA console.
-- [ ] Move implementation to C.
-- [ ] Keep low-level wrappers in assembly only if needed.
-- [ ] Preserve public behavior and markers.
+  - [x] Recommended: VGA console.
+- [x] Move implementation to C.
+- [x] Keep low-level wrappers in assembly only if needed.
+- [x] Preserve public behavior and markers.
 
 ## Phase 2 - Validation
 
-- [ ] CK-T5: First migrated subsystem passes all prior tests.
-- [ ] `make check-vga-all` still passes if VGA is the first migrated subsystem.
+- [x] CK-T5: First migrated subsystem passes all prior tests.
+- [x] `make check-vga-all` still passes if VGA is the first migrated subsystem.
 
 ## Phase 3 - Interrupt and Table Helper Migration
 

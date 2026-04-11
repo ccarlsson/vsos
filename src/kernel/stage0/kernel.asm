@@ -234,12 +234,6 @@ msg_dl db ' DL=', 0
 msg_p1 db 'P1', 0
 msg_p2 db 'P2', 0
 msg_pm_ok db ' PM_OK', 0
-msg_vga_init_ok db ' VGA_INIT_OK', 0
-msg_vga_char_ok db ' VGA_CHAR_OK', 0
-msg_vga_str_ok db ' VGA_STR_OK', 0
-msg_vga_nl_ok db ' VGA_NL_OK', 0
-msg_vga_wrap_ok db ' VGA_WRAP_OK', 0
-msg_vga_scroll_ok db ' VGA_SCROLL_OK', 0
 msg_c_entry_ok db ' C_ENTRY_OK', 0
 msg_ih_ok db ' IH_OK', 0
 msg_ix_00 db ' IX_00', 0
@@ -286,24 +280,6 @@ protected_mode_entry:
     mov esp, PM_STACK_TOP
 
     mov esi, msg_pm_ok
-    call print_string_pm
-
-    mov esi, msg_vga_init_ok
-    call print_string_pm
-
-    mov esi, msg_vga_char_ok
-    call print_string_pm
-
-    mov esi, msg_vga_str_ok
-    call print_string_pm
-
-    mov esi, msg_vga_nl_ok
-    call print_string_pm
-
-    mov esi, msg_vga_wrap_ok
-    call print_string_pm
-
-    mov esi, msg_vga_scroll_ok
     call print_string_pm
 
     call kmain

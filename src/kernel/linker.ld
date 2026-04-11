@@ -28,11 +28,15 @@ SECTIONS
         *(.data.*)
     }
 
-    /DISCARD/ :
+    .bss : ALIGN(16)
     {
         *(.bss)
         *(.bss.*)
         *(COMMON)
+    }
+
+    /DISCARD/ :
+    {
         *(.comment)
         *(.note*)
         *(.eh_frame)
