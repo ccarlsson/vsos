@@ -11,6 +11,7 @@ DEBUG_LOG="build/qemu-vga-t6-debug.log"
 timeout "$QEMU_TIMEOUT_SECONDS" qemu-system-i386 \
     -drive format=raw,file="$DISK_IMG" \
     -debugcon file:"$DEBUG_LOG" \
+    -display none \
     2>/dev/null
 
 if grep -q "VGA_SCROLL_OK" "$DEBUG_LOG"; then

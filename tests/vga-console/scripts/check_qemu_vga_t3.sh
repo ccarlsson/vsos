@@ -18,6 +18,7 @@ fi
 timeout "$QEMU_TIMEOUT_SECONDS" qemu-system-i386 \
     -drive format=raw,file="$IMAGE" \
     -debugcon file:build/qemu-vga-t3-debug.log \
+    -display none \
     -no-reboot \
     2>&1 || true
 
