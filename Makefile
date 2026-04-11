@@ -2,12 +2,41 @@ BOOT_SRC := src/bootloader/stage1/boot.asm
 BOOT_BIN := build/boot.bin
 BOOT_INVALID_BIN := build/boot.invalid.bin
 KERNEL_SRC := src/kernel/stage0/kernel.asm
+KERNEL_C_MAIN_SRC := src/kernel/stage1/kmain.c
+KERNEL_C_VGA_SRC := src/kernel/stage1/vga.c
+KERNEL_C_IDT_SRC := src/kernel/stage1/idt.c
+KERNEL_C_IH_SRC := src/kernel/stage1/interrupts.c
+KERNEL_LD_SCRIPT := src/kernel/linker.ld
 KERNEL_BIN := build/kernel.bin
+KERNEL_ELF := build/kernel.elf
+KERNEL_ASM_OBJ := build/kernel.stage0.o
+KERNEL_C_MAIN_OBJ := build/kernel.stage1.o
+KERNEL_C_VGA_OBJ := build/kernel.vga.o
+KERNEL_C_IDT_OBJ := build/kernel.idt.o
+KERNEL_C_IH_OBJ := build/kernel.interrupts.o
+KERNEL_C_OBJS := $(KERNEL_C_MAIN_OBJ) $(KERNEL_C_VGA_OBJ) $(KERNEL_C_IDT_OBJ) $(KERNEL_C_IH_OBJ)
+CC32 ?= gcc
+LD32 ?= ld
+OBJCOPY ?= objcopy
+C32_CFLAGS := -m32 -ffreestanding -fno-pic -fno-pie -fno-stack-protector -Wall -Wextra -Iinclude
+LD32_FLAGS := -m elf_i386 -T $(KERNEL_LD_SCRIPT)
+C_TOOLCHAIN_PROBE_SRC := tests/c-kernel-transition/probes/freestanding_probe.c
+C_TOOLCHAIN_PROBE_OBJ := build/freestanding_probe.o
 KERNEL_PM_A20FAIL_BIN := build/kernel.pm.a20fail.bin
+KERNEL_PM_A20FAIL_ELF := build/kernel.pm.a20fail.elf
+KERNEL_PM_A20FAIL_ASM_OBJ := build/kernel.pm.a20fail.stage0.o
 KERNEL_PM_BADSEL_BIN := build/kernel.pm.badsel.bin
+KERNEL_PM_BADSEL_ELF := build/kernel.pm.badsel.elf
+KERNEL_PM_BADSEL_ASM_OBJ := build/kernel.pm.badsel.stage0.o
 KERNEL_IH_DIV0_BIN := build/kernel.ih.div0.bin
+KERNEL_IH_DIV0_ELF := build/kernel.ih.div0.elf
+KERNEL_IH_DIV0_ASM_OBJ := build/kernel.ih.div0.stage0.o
 KERNEL_IH_UD2_BIN := build/kernel.ih.ud2.bin
+KERNEL_IH_UD2_ELF := build/kernel.ih.ud2.elf
+KERNEL_IH_UD2_ASM_OBJ := build/kernel.ih.ud2.stage0.o
 KERNEL_IH_MULTI_BIN := build/kernel.ih.multi.bin
+KERNEL_IH_MULTI_ELF := build/kernel.ih.multi.elf
+KERNEL_IH_MULTI_ASM_OBJ := build/kernel.ih.multi.stage0.o
 DISK_IMG := build/disk.img
 DISK_PM_T2_IMG := build/disk-pm-t2.img
 DISK_PM_T3_IMG := build/disk-pm-t3.img
@@ -15,7 +44,7 @@ DISK_IH_T2_IMG := build/disk-ih-t2.img
 DISK_IH_T3_IMG := build/disk-ih-t3.img
 DISK_IH_T4_IMG := build/disk-ih-t4.img
 
-.PHONY: all clean check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -27,29 +56,93 @@ $(BOOT_INVALID_BIN): $(BOOT_SRC)
 	mkdir -p build
 	nasm -f bin -DKERNEL_SECTOR_COUNT=0 -o $(BOOT_INVALID_BIN) $(BOOT_SRC)
 
-$(KERNEL_BIN): $(KERNEL_SRC)
+$(KERNEL_C_MAIN_OBJ): $(KERNEL_C_MAIN_SRC)
 	mkdir -p build
-	nasm -f bin -o $(KERNEL_BIN) $(KERNEL_SRC)
+	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_MAIN_OBJ) $(KERNEL_C_MAIN_SRC)
 
-$(KERNEL_PM_A20FAIL_BIN): $(KERNEL_SRC)
+$(KERNEL_C_VGA_OBJ): $(KERNEL_C_VGA_SRC)
 	mkdir -p build
-	nasm -f bin -DFORCE_A20_FAILURE=1 -o $(KERNEL_PM_A20FAIL_BIN) $(KERNEL_SRC)
+	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_VGA_OBJ) $(KERNEL_C_VGA_SRC)
 
-$(KERNEL_PM_BADSEL_BIN): $(KERNEL_SRC)
+$(KERNEL_C_IDT_OBJ): $(KERNEL_C_IDT_SRC)
 	mkdir -p build
-	nasm -f bin -DCODE_SEL=0x18 -o $(KERNEL_PM_BADSEL_BIN) $(KERNEL_SRC)
+	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_IDT_OBJ) $(KERNEL_C_IDT_SRC)
 
-$(KERNEL_IH_DIV0_BIN): $(KERNEL_SRC)
+$(KERNEL_C_IH_OBJ): $(KERNEL_C_IH_SRC)
 	mkdir -p build
-	nasm -f bin -DEXCEPTION_TEST=1 -o $(KERNEL_IH_DIV0_BIN) $(KERNEL_SRC)
+	$(CC32) $(C32_CFLAGS) -c -o $(KERNEL_C_IH_OBJ) $(KERNEL_C_IH_SRC)
 
-$(KERNEL_IH_UD2_BIN): $(KERNEL_SRC)
+$(KERNEL_ASM_OBJ): $(KERNEL_SRC)
 	mkdir -p build
-	nasm -f bin -DEXCEPTION_TEST=2 -o $(KERNEL_IH_UD2_BIN) $(KERNEL_SRC)
+	nasm -f elf32 -o $(KERNEL_ASM_OBJ) $(KERNEL_SRC)
 
-$(KERNEL_IH_MULTI_BIN): $(KERNEL_SRC)
+$(KERNEL_ELF): $(KERNEL_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
 	mkdir -p build
-	nasm -f bin -DINTERRUPT_TEST_MODE=1 -o $(KERNEL_IH_MULTI_BIN) $(KERNEL_SRC)
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_ELF) $(KERNEL_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_BIN): $(KERNEL_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_ELF) $(KERNEL_BIN)
+
+$(KERNEL_PM_A20FAIL_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DFORCE_A20_FAILURE=1 -o $(KERNEL_PM_A20FAIL_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_PM_A20FAIL_ELF): $(KERNEL_PM_A20FAIL_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_PM_A20FAIL_ELF) $(KERNEL_PM_A20FAIL_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_PM_A20FAIL_BIN): $(KERNEL_PM_A20FAIL_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_PM_A20FAIL_ELF) $(KERNEL_PM_A20FAIL_BIN)
+
+$(KERNEL_PM_BADSEL_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DCODE_SEL=0x18 -o $(KERNEL_PM_BADSEL_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_PM_BADSEL_ELF): $(KERNEL_PM_BADSEL_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_PM_BADSEL_ELF) $(KERNEL_PM_BADSEL_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_PM_BADSEL_BIN): $(KERNEL_PM_BADSEL_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_PM_BADSEL_ELF) $(KERNEL_PM_BADSEL_BIN)
+
+$(KERNEL_IH_DIV0_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DEXCEPTION_TEST=1 -o $(KERNEL_IH_DIV0_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_IH_DIV0_ELF): $(KERNEL_IH_DIV0_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_IH_DIV0_ELF) $(KERNEL_IH_DIV0_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_IH_DIV0_BIN): $(KERNEL_IH_DIV0_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_IH_DIV0_ELF) $(KERNEL_IH_DIV0_BIN)
+
+$(KERNEL_IH_UD2_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DEXCEPTION_TEST=2 -o $(KERNEL_IH_UD2_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_IH_UD2_ELF): $(KERNEL_IH_UD2_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_IH_UD2_ELF) $(KERNEL_IH_UD2_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_IH_UD2_BIN): $(KERNEL_IH_UD2_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_IH_UD2_ELF) $(KERNEL_IH_UD2_BIN)
+
+$(KERNEL_IH_MULTI_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DINTERRUPT_TEST_MODE=1 -o $(KERNEL_IH_MULTI_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_IH_MULTI_ELF): $(KERNEL_IH_MULTI_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_IH_MULTI_ELF) $(KERNEL_IH_MULTI_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_IH_MULTI_BIN): $(KERNEL_IH_MULTI_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_IH_MULTI_ELF) $(KERNEL_IH_MULTI_BIN)
 
 $(DISK_IMG): $(BOOT_BIN) $(KERNEL_BIN)
 	mkdir -p build
@@ -88,6 +181,17 @@ $(DISK_IH_T4_IMG): $(BOOT_BIN) $(KERNEL_IH_MULTI_BIN)
 	dd if=$(KERNEL_IH_MULTI_BIN) of=$(DISK_IH_T4_IMG) bs=512 seek=1 conv=notrunc status=none
 
 disk-image: $(DISK_IMG)
+
+check-c-toolchain:
+	mkdir -p build
+	command -v $(CC32) >/dev/null
+	command -v $(LD32) >/dev/null
+	command -v $(OBJCOPY) >/dev/null
+	$(CC32) $(C32_CFLAGS) -c -o $(C_TOOLCHAIN_PROBE_OBJ) $(C_TOOLCHAIN_PROBE_SRC)
+	@echo "PASS: freestanding 32-bit C toolchain verified"
+
+check-c-t1: $(DISK_IMG)
+	sh tests/c-kernel-transition/scripts/check_qemu_c_t1.sh $(DISK_IMG)
 
 check-boot: $(BOOT_BIN)
 	sh tests/bootloader/scripts/check_boot_sector.sh $(BOOT_BIN)
