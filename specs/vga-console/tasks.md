@@ -4,18 +4,30 @@ This checklist translates `spec.md` and `plan.md` into implementation-ready work
 
 ## Phase 0 - Specification and Constants Lock
 
-- [ ] Verify 0xB8000 accessibility in protected mode context.
-- [ ] Document cell format: 2 bytes (char + attr) per position.
-- [ ] Define register conventions:
-  - [ ] Character output: AL = ASCII, (AH or global default) = attribute.
-  - [ ] String output: ESI or explicit address = string pointer.
-- [ ] Add constants to kernel.asm source comments:
-  - [ ] VGA_FRAMEBUFFER = 0xB8000
-  - [ ] VGA_COLS = 80
-  - [ ] VGA_ROWS = 25
-  - [ ] VGA_CELL_SIZE = 2
-  - [ ] VGA_DEFAULT_ATTR = 0x07
-- [ ] Confirm test capture strategy (QEMU serial relay or memory inspection).
+- [x] Verify 0xB8000 accessibility in protected mode context.
+  - Implemented `verify_vga_accessible` routine in kernel.asm
+  - Writes test pattern (space + 0x07 attr) to first VGA cell
+  - Reads back and verifies write succeeded
+  - Emits `VGA_OK` marker on success
+  - QEMU test confirmed: output shows "VSOS M1 DL=80 KERNEL_OK DL=80 PM_OK VGA_OK IH_OK"
+- [x] Document cell format: 2 bytes (char + attr) per position.
+  - Constant: VGA_CELL_SIZE = 2
+  - Comment in spec: char at byte 0, attribute at byte 1
+- [x] Define register conventions:
+  - [x] Character output: AL = ASCII, (AH or global default) = attribute.
+  - [x] String output: ESI or explicit address = string pointer.
+  - Added detailed comments in kernel.asm explaining each routine's inputs/outputs
+- [x] Add constants to kernel.asm source comments:
+  - [x] VGA_FRAMEBUFFER = 0xB8000
+  - [x] VGA_COLS = 80
+  - [x] VGA_ROWS = 25
+  - [x] VGA_CELL_SIZE = 2
+  - [x] VGA_DEFAULT_ATTR = 0x07
+  - [x] VGA_FRAMEBUFFER_SIZE = 4000 (80*25*2)
+- [x] Confirm test capture strategy (QEMU serial relay or memory inspection).
+  - Test strategy: Emit VGA_OK marker via debugcon (port 0xE9)
+  - Capture via QEMU `-debugcon file:` option
+  - Grep for marker in output log to validate accessibility
 
 ## Phase 1 - Basic Output Routines
 

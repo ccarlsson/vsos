@@ -17,6 +17,41 @@ EXPECTED_DATA_SEL equ 0x10
 IDT_ENTRY_COUNT equ 256
 IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 
+; VGA Console Constants (Phase 4)
+; ================================
+; VGA text mode framebuffer address (linear, protected mode)
+VGA_FRAMEBUFFER equ 0xB8000
+; VGA text mode dimensions
+VGA_COLS equ 80
+VGA_ROWS equ 25
+; Size of one character cell (char + attribute = 2 bytes)
+VGA_CELL_SIZE equ 2
+; Total framebuffer size in bytes
+VGA_FRAMEBUFFER_SIZE equ VGA_COLS * VGA_ROWS * VGA_CELL_SIZE
+; Default attribute byte: 0x07 = white (0x7) on black (0x0)
+; Format: bits 7-4 = background, bits 3-0 = foreground
+VGA_DEFAULT_ATTR equ 0x07
+
+; VGA Calling Conventions (Phase 4)
+; ==================================
+; vga_char: Output single character
+;   Input:  AL = ASCII character code
+;           (AH or global context) = attribute byte (default 0x07)
+;   Output: Framebuffer updated, cursor advanced
+;   Side effects: Changes cursor position, modifies framebuffer cells
+;
+; vga_string: Output null-terminated string
+;   Input:  ESI = pointer to buffer with null-terminated string
+;   Output: String copied to framebuffer starting at current cursor
+;           Cursor advanced to end of string
+;   Side effects: Multiple framebuffer updates, cursor advanced
+;
+; vga_init: Clear framebuffer and reset cursor
+;   Input:  none
+;   Output: Framebuffer cleared to spaces (0x20) with default attribute (0x07)
+;           Cursor position reset to (0, 0)
+;   Side effects: Entire framebuffer overwritten
+
 %ifndef FORCE_A20_FAILURE
 %define FORCE_A20_FAILURE 0
 %endif
@@ -248,6 +283,15 @@ protected_mode_entry:
     mov esi, KERNEL_LINEAR_BASE + msg_pm_ok
     call print_string_pm
 
+    ; Phase 0: Verify VGA framebuffer accessibility
+    call verify_vga_accessible
+    jc vga_not_accessible
+
+    mov esi, KERNEL_LINEAR_BASE + msg_vga_ok
+    call print_string_pm
+
+vga_not_accessible:
+
     call init_idt
     sti
 
@@ -278,6 +322,29 @@ halt_pm:
     cli
     hlt
     jmp halt_pm
+
+verify_vga_accessible:
+    ; Phase 0: Test 0xB8000 accessibility
+    ; Write a test pattern (space + white-on-black) to first cell
+    ; Then read it back to verify write succeeded.
+    pushad
+
+    mov eax, VGA_FRAMEBUFFER
+    mov word [eax], 0x0720  ; space (0x20) with attr (0x07)
+
+    ; Read back and verify
+    cmp word [eax], 0x0720
+    je .vga_ok
+
+    ; Failed to write/read
+    stc
+    popad
+    ret
+
+.vga_ok:
+    clc
+    popad
+    ret
 
 init_idt:
     pushad
@@ -393,6 +460,7 @@ print_string_pm:
     ret
 
 msg_pm_ok db ' PM_OK', 0
+msg_vga_ok db ' VGA_OK', 0
 msg_ih_ok db ' IH_OK', 0
 msg_ix_00 db ' IX_00', 0
 msg_ix_06 db ' IX_06', 0
