@@ -14,9 +14,19 @@ A20_PORT equ 0x92
 KERNEL_LINEAR_BASE equ 0x00010000
 EXPECTED_CODE_SEL equ 0x08
 EXPECTED_DATA_SEL equ 0x10
+IDT_ENTRY_COUNT equ 256
+IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 
 %ifndef FORCE_A20_FAILURE
 %define FORCE_A20_FAILURE 0
+%endif
+
+%ifndef EXCEPTION_TEST
+%define EXCEPTION_TEST 0
+%endif
+
+%ifndef INTERRUPT_TEST_MODE
+%define INTERRUPT_TEST_MODE 0
 %endif
 
 jmp short start
@@ -238,10 +248,137 @@ protected_mode_entry:
     mov esi, KERNEL_LINEAR_BASE + msg_pm_ok
     call print_string_pm
 
+    call init_idt
+    sti
+
+%if INTERRUPT_TEST_MODE = 1
+    ; Deterministic Phase 3 multi-interrupt path.
+    int 0x20
+    int 0x20
+    int 0x20
+
+    cmp byte [KERNEL_LINEAR_BASE + ih_count], 3
+    jb halt_pm
+%else
+    ; Deterministic Phase 1 interrupt path.
+    int 0x20
+
+    cmp byte [KERNEL_LINEAR_BASE + ih_seen], 1
+    jne halt_pm
+%endif
+
+%if EXCEPTION_TEST = 1
+    xor edx, edx
+    div edx
+%elif EXCEPTION_TEST = 2
+    ud2
+%endif
+
 halt_pm:
     cli
     hlt
     jmp halt_pm
+
+init_idt:
+    pushad
+
+    xor ecx, ecx
+.fill_default:
+    mov eax, KERNEL_LINEAR_BASE + isr_default_stub
+    call set_idt_gate
+    inc ecx
+    cmp ecx, IDT_ENTRY_COUNT
+    jb .fill_default
+
+    mov ecx, 0x20
+    mov eax, KERNEL_LINEAR_BASE + isr_timer_stub
+    call set_idt_gate
+
+    mov ecx, 0x00
+    mov eax, KERNEL_LINEAR_BASE + isr_exc0_stub
+    call set_idt_gate
+
+    mov ecx, 0x06
+    mov eax, KERNEL_LINEAR_BASE + isr_exc6_stub
+    call set_idt_gate
+
+    mov ecx, 0x0D
+    mov eax, KERNEL_LINEAR_BASE + isr_exc13_stub
+    call set_idt_gate
+
+    popad
+    lidt [KERNEL_LINEAR_BASE + idtr]
+    ret
+
+set_idt_gate:
+    mov edi, KERNEL_LINEAR_BASE + idt_start
+    mov ebx, ecx
+    shl ebx, 3
+    add edi, ebx
+
+    mov bx, ax
+    mov [edi + 0], bx
+    mov word [edi + 2], CODE_SEL
+    mov byte [edi + 4], 0
+    mov byte [edi + 5], 0x8E
+    shr eax, 16
+    mov [edi + 6], ax
+    ret
+
+isr_default_stub:
+    cli
+.default_halt:
+    hlt
+    jmp .default_halt
+
+isr_timer_stub:
+    pushad
+    mov byte [KERNEL_LINEAR_BASE + ih_seen], 1
+    inc byte [KERNEL_LINEAR_BASE + ih_count]
+    mov esi, KERNEL_LINEAR_BASE + msg_ih_ok
+    call print_string_pm
+    popad
+    iret
+
+isr_exc0_stub:
+    pushad
+    mov eax, [esp + 32]
+    mov [KERNEL_LINEAR_BASE + last_exc_eip], eax
+    mov dword [KERNEL_LINEAR_BASE + last_exc_error], 0
+    mov byte [KERNEL_LINEAR_BASE + last_exc_vector], 0x00
+    mov esi, KERNEL_LINEAR_BASE + msg_ix_00
+    call print_string_pm
+    popad
+    jmp exception_halt
+
+isr_exc6_stub:
+    pushad
+    mov eax, [esp + 32]
+    mov [KERNEL_LINEAR_BASE + last_exc_eip], eax
+    mov dword [KERNEL_LINEAR_BASE + last_exc_error], 0
+    mov byte [KERNEL_LINEAR_BASE + last_exc_vector], 0x06
+    mov esi, KERNEL_LINEAR_BASE + msg_ix_06
+    call print_string_pm
+    popad
+    jmp exception_halt
+
+isr_exc13_stub:
+    pushad
+    mov eax, [esp + 36]
+    mov [KERNEL_LINEAR_BASE + last_exc_eip], eax
+    mov eax, [esp + 32]
+    mov [KERNEL_LINEAR_BASE + last_exc_error], eax
+    mov byte [KERNEL_LINEAR_BASE + last_exc_vector], 0x0D
+    mov esi, KERNEL_LINEAR_BASE + msg_ix_13
+    call print_string_pm
+    popad
+    jmp exception_halt
+
+exception_halt:
+    cli
+.halt_loop:
+    hlt
+    jmp .halt_loop
 
 print_string_pm:
     lodsb
@@ -256,3 +393,23 @@ print_string_pm:
     ret
 
 msg_pm_ok db ' PM_OK', 0
+msg_ih_ok db ' IH_OK', 0
+msg_ix_00 db ' IX_00', 0
+msg_ix_06 db ' IX_06', 0
+msg_ix_13 db ' IX_13', 0
+
+ih_seen db 0
+ih_count db 0
+last_exc_vector db 0
+align 4
+last_exc_error dd 0
+last_exc_eip dd 0
+align 8
+
+idt_start:
+    times IDT_ENTRY_COUNT dq 0
+idt_end:
+
+idtr:
+    dw IDT_LIMIT
+    dd KERNEL_LINEAR_BASE + idt_start
