@@ -5,12 +5,12 @@ This checklist translates `spec.md` into implementation-ready work.
 ## Phase 0 - Design Lock
 
 - [x] Decide visible stages for bootloader, transition, and kernel bring-up.
-	- `Boot: start`
-	- `Boot: loading kernel`
-	- `Boot: entering kernel`
-	- `Kernel: protected mode`
-	- `Kernel: VGA ready`
-	- `Kernel: init complete`
+  - `Boot: start`
+  - `Boot: loading kernel`
+  - `Boot: entering kernel`
+  - `Kernel: protected mode`
+  - `Kernel: VGA ready`
+  - `Kernel: init complete`
 - [x] Define final short message text for each visible stage.
 - [x] Lock compatibility rule for existing debug markers.
 
@@ -30,21 +30,21 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Phase 3 - Validation and Regression
 
-- [ ] Validate visible message order in QEMU.
-- [ ] Run existing automated suites.
-- [ ] Update docs if visible stage text changes from initial draft.
+- [x] Validate visible message order in QEMU.
+- [x] Run existing automated suites.
+- [x] Update docs if visible stage text changes from initial draft.
 
 ## Requirement Traceability Checklist
 
-- [ ] BSO-FR-1 satisfied.
-- [ ] BSO-FR-2 satisfied.
-- [ ] BSO-FR-3 satisfied.
-- [ ] BSO-FR-4 satisfied.
-- [ ] BSO-FR-5 satisfied.
-- [ ] BSO-FR-6 satisfied.
+- [x] BSO-FR-1 satisfied.
+- [x] BSO-FR-2 satisfied.
+- [x] BSO-FR-3 satisfied.
+- [x] BSO-FR-4 satisfied.
+- [x] BSO-FR-5 satisfied.
+- [x] BSO-FR-6 satisfied.
 
 ## Done Criteria
 
-- [ ] Human-readable boot messages visible from bootloader through early kernel.
-- [ ] Existing automated tests still pass.
-- [ ] Visible output remains short, clear, and deterministic.
+- [x] Human-readable boot messages visible from bootloader through early kernel.
+- [x] Existing automated tests still pass.
+- [x] Visible output remains short, clear, and deterministic.
