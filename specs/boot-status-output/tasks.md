@@ -23,10 +23,10 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Phase 2 - Early Kernel Messages
 
-- [ ] Add protected-mode / kernel entry message visible to the user.
-- [ ] Add readable VGA-init / early-kernel progress text.
-- [ ] Replace current non-user-facing visible test output where appropriate.
-- [ ] Keep debug markers unchanged for automation.
+- [x] Add protected-mode / kernel entry message visible to the user.
+- [x] Add readable VGA-init / early-kernel progress text.
+- [x] Replace current non-user-facing visible test output where appropriate.
+- [x] Keep debug markers unchanged for automation.
 
 ## Phase 3 - Validation and Regression
 
