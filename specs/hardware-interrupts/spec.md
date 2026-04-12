@@ -75,7 +75,14 @@ All other IRQ lines remain masked to keep behavior deterministic.
 ### HI-FR-3 PIT Periodic Timer
 
 Kernel must program PIT channel 0 in periodic mode at a fixed documented
-frequency for tests (for example 100 Hz).
+frequency for tests.
+
+Locked v1 values:
+
+- PIT input clock: 1,193,182 Hz
+- PIT mode: channel 0, lobyte/hibyte, mode 2 (rate generator)
+- PIT divisor: 11,931
+- Effective tick rate: ~100 Hz
 
 ### HI-FR-4 IRQ0 Handler
 
@@ -94,12 +101,12 @@ markers:
 
 - `HI_INIT_OK`: PIC + PIT init completed.
 - `HI_IRQ0_OK`: timer IRQ handler executed at least once.
-- `HI_TICKS_n`: optional bounded tick marker for deterministic thresholds.
+- `HI_TICKS_3`: tick counter reached 3.
 
 ### HI-FR-6 Safe Failure Behavior
 
 If PIC/PIT init invariants fail in test variants, kernel must emit a distinct
-failure marker and halt in `cli` + `hlt` loop.
+failure marker (`HI_INIT_FAIL`) and halt in `cli` + `hlt` loop.
 
 ## 7. Non-Functional Requirements
 
@@ -187,7 +194,11 @@ Acceptance:
 - Interrupt source for v1: PIT channel 0 via IRQ0.
 - IRQ vector map: PIC remapped to 0x20-0x2F.
 - Enabled IRQ lines in v1: IRQ0 only.
+- PIC initialization: ICW1=0x11, master offset=0x20, slave offset=0x28, ICW3 master=0x04, ICW3 slave=0x02, ICW4=0x01.
+- IRQ masks after init: master=0xFE (IRQ0 unmasked), slave=0xFF (all masked).
+- PIT configuration: command=0x34, divisor=11931 (~100 Hz).
 - Test strategy: debug-port markers captured in QEMU log.
+- Marker contract: `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`; failure marker `HI_INIT_FAIL`.
 - Failure strategy: marker + `cli` + `hlt` loop.
 
 ## 12. Definition of Done

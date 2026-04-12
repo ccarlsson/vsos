@@ -4,10 +4,13 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Phase 0 - Design Lock
 
-- [ ] Confirm and document PIC vector offsets (0x20/0x28).
-- [ ] Confirm and document v1 IRQ mask policy (IRQ0 only).
-- [ ] Confirm and document PIT target frequency/divisor.
-- [ ] Lock marker strings and test thresholds.
+- [x] Confirm and document PIC vector offsets (0x20/0x28).
+- [x] Confirm and document v1 IRQ mask policy (IRQ0 only).
+	- master mask = 0xFE, slave mask = 0xFF
+- [x] Confirm and document PIT target frequency/divisor.
+	- PIT command = 0x34, divisor = 11931 (~100 Hz)
+- [x] Lock marker strings and test thresholds.
+	- `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`, `HI_INIT_FAIL`
 
 ## Phase 1 - PIC/PIT Bring-up (HI-M1)
 

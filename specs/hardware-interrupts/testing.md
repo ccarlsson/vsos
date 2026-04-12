@@ -26,14 +26,24 @@ files by test scripts.
 
 - HI-T1 expects: `HI_INIT_OK`
 - HI-T2 expects: `HI_IRQ0_OK`
-- HI-T3 expects: deterministic threshold marker (for example `HI_TICKS_3`)
+- HI-T3 expects: deterministic threshold marker `HI_TICKS_3`
 - HI-T4 expects: no unexpected IRQ marker noise while IRQ0 remains functional
+
+Failure marker for init variants:
+
+- `HI_INIT_FAIL`
 
 ## Suggested Build/Test Variants
 
 - Default variant: real PIT IRQ0 path with IRQ0 unmasked
 - Negative variant (optional): intentionally broken PIC/PIT init to verify
   failure marker + halt behavior
+
+## Phase 0 Locked Runtime Values
+
+- PIC remap offsets: master 0x20, slave 0x28
+- IRQ masks after init: master 0xFE, slave 0xFF
+- PIT setup: command 0x34, divisor 11931 (~100 Hz)
 
 ## Regression Recommendations
 

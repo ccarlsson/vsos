@@ -21,8 +21,8 @@ Tasks:
 
 - Confirm PIC offsets: master 0x20, slave 0x28.
 - Confirm v1 mask policy: unmask IRQ0 only.
-- Confirm PIT test frequency (for example 100 Hz).
-- Finalize markers: `HI_INIT_OK`, `HI_IRQ0_OK`, optional tick threshold marker.
+- Confirm PIT test frequency (100 Hz via divisor 11931).
+- Finalize markers: `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`, and `HI_INIT_FAIL`.
 
 Deliverables:
 
@@ -31,6 +31,15 @@ Deliverables:
 Exit criteria:
 
 - No unresolved design questions before coding.
+
+Status: Complete.
+
+Phase 0 locked values:
+
+- PIC offsets: master 0x20, slave 0x28.
+- IRQ mask policy: unmask IRQ0 only (master mask 0xFE, slave mask 0xFF).
+- PIT target: ~100 Hz using divisor 11931 and command 0x34.
+- Marker contract: `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`; failure marker `HI_INIT_FAIL`.
 
 ### Phase 1 - PIC/PIT Bring-up (HI-M1)
 
