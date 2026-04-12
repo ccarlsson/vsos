@@ -28,10 +28,15 @@ IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 %define INTERRUPT_TEST_MODE 0
 %endif
 
+%ifndef HARDWARE_IRQ_TEST_MODE
+%define HARDWARE_IRQ_TEST_MODE 0
+%endif
+
 %define RM_OFF(sym) (sym - kernel_image_start)
 
 extern kmain
 extern init_idt_c
+extern init_hw_interrupts_c
 extern ih_handle_timer_c
 extern ih_handle_exception_c
 
@@ -48,6 +53,7 @@ global isr_exc6_stub
 global isr_exc13_stub
 global ih_seen
 global ih_count
+global hi_hw_tick_count
 global last_exc_vector
 global last_exc_error
 global last_exc_eip
@@ -270,6 +276,7 @@ gdtr:
 align 4
 ih_seen db 0
 ih_count db 0
+hi_hw_tick_count db 0
 last_exc_vector db 0
 align 4
 last_exc_error dd 0
@@ -302,9 +309,15 @@ protected_mode_entry:
 
 pm_main:
     call init_idt_c
+    call init_hw_interrupts_c
     sti
 
-%if INTERRUPT_TEST_MODE = 1
+%if HARDWARE_IRQ_TEST_MODE = 1
+.wait_ticks:
+    hlt
+    cmp byte [hi_hw_tick_count], 3
+    jb .wait_ticks
+%elif INTERRUPT_TEST_MODE = 1
     int 0x20
     int 0x20
     int 0x20
