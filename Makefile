@@ -44,7 +44,7 @@ DISK_IH_T2_IMG := build/disk-ih-t2.img
 DISK_IH_T3_IMG := build/disk-ih-t3.img
 DISK_IH_T4_IMG := build/disk-ih-t4.img
 
-.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -235,6 +235,11 @@ check-ih-t4: $(DISK_IH_T4_IMG)
 	sh tests/interrupt-handling/scripts/check_qemu_ih_t4.sh $(DISK_IH_T4_IMG)
 
 check-ih-all: check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4
+
+check-hi-t1: $(DISK_IMG)
+	sh tests/hardware-interrupts/scripts/check_qemu_hi_t1.sh $(DISK_IMG)
+
+check-hi-all: check-hi-t1
 
 check-vga-t1: $(DISK_IMG)
 	sh tests/vga-console/scripts/check_qemu_vga_t1.sh $(DISK_IMG)

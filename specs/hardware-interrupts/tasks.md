@@ -16,25 +16,25 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ### PIC
 
-- [ ] Add PIC command/data port constants.
-- [ ] Implement PIC remap routine (ICW1-ICW4 sequence).
-- [ ] Implement PIC mask routine for master/slave IMRs.
-- [ ] Mask all IRQ lines except IRQ0 in v1.
+- [x] Add PIC command/data port constants.
+- [x] Implement PIC remap routine (ICW1-ICW4 sequence).
+- [x] Implement PIC mask routine for master/slave IMRs.
+- [x] Mask all IRQ lines except IRQ0 in v1.
 
 ### PIT
 
-- [ ] Add PIT command/channel constants.
-- [ ] Program PIT channel 0 periodic mode.
-- [ ] Set fixed divisor for deterministic tick interval.
+- [x] Add PIT command/channel constants.
+- [x] Program PIT channel 0 periodic mode.
+- [x] Set fixed divisor for deterministic tick interval.
 
 ### Integration
 
-- [ ] Run PIC/PIT init before `sti`.
-- [ ] Emit `HI_INIT_OK` marker after successful setup.
+- [x] Run PIC/PIT init before `sti`.
+- [x] Emit `HI_INIT_OK` marker after successful setup.
 
 ### Validation
 
-- [ ] HI-T1: init marker appears in QEMU debug log.
+- [x] HI-T1: init marker appears in QEMU debug log.
 
 ## Phase 2 - IRQ0 Runtime Path (HI-M2)
 
@@ -60,7 +60,7 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ### Scripts
 
-- [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t1.sh`.
+- [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t1.sh`.
 - [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t2.sh`.
 - [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t3.sh`.
 - [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t4.sh`.
@@ -68,7 +68,7 @@ This checklist translates `spec.md` into implementation-ready work.
 ### Makefile
 
 - [ ] Add `check-hi-t1`, `check-hi-t2`, `check-hi-t3`, `check-hi-t4`.
-- [ ] Add aggregate `check-hi-all`.
+- [x] Add aggregate `check-hi-all`.
 - [ ] Include hardware-interrupt suite in `check-all`.
 
 ### CI and docs

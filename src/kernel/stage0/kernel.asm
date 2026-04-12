@@ -32,6 +32,7 @@ IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 
 extern kmain
 extern init_idt_c
+extern init_hw_interrupts_c
 extern ih_handle_timer_c
 extern ih_handle_exception_c
 
@@ -302,6 +303,7 @@ protected_mode_entry:
 
 pm_main:
     call init_idt_c
+    call init_hw_interrupts_c
     sti
 
 %if INTERRUPT_TEST_MODE = 1
