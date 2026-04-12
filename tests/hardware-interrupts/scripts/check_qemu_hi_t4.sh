@@ -38,11 +38,17 @@ if ! grep -q 'HI_IRQ0_OK' "$LOG_FILE"; then
     exit 1
 fi
 
+if ! grep -q 'HI_TICKS_3' "$LOG_FILE"; then
+    echo "FAIL: multi-tick liveness not verified (HI_TICKS_3 missing)"
+    cat "$LOG_FILE"
+    exit 1
+fi
+
 if grep -qE 'IX_00|IX_06|IX_13' "$LOG_FILE"; then
     echo "FAIL: unexpected exception marker detected (spurious IRQ or fault)"
     cat "$LOG_FILE"
     exit 1
 fi
 
-echo "PASS: IRQ mask discipline verified (IRQ0 functional, no spurious faults)"
+echo "PASS: IRQ mask discipline verified (IRQ0 functional, multi-tick alive, no spurious faults)"
 exit 0

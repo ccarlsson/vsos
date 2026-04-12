@@ -48,7 +48,7 @@ KERNEL_HI_T2_ELF := build/kernel.hi.t2.elf
 KERNEL_HI_T2_ASM_OBJ := build/kernel.hi.t2.stage0.o
 DISK_HI_T2_IMG := build/disk-hi-t2.img
 
-.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-t2 check-hi-t3 check-hi-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-t2 check-hi-t3 check-hi-t4 check-hi-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 

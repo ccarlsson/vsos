@@ -27,21 +27,21 @@ Tasks:
 Locked Phase 0 decisions:
 
 - Visible stages:
-	- bootloader start
-	- kernel loading
-	- kernel handoff
-	- protected-mode entry
-	- VGA ready
-	- early init complete
+  - bootloader start
+  - kernel loading
+  - kernel handoff
+  - protected-mode entry
+  - VGA ready
+  - early init complete
 - Final message text:
-	- `Boot: start`
-	- `Boot: loading kernel`
-	- `Boot: entering kernel`
-	- `Kernel: protected mode`
-	- `Kernel: VGA ready`
-	- `Kernel: init complete`
+  - `Boot: start`
+  - `Boot: loading kernel`
+  - `Boot: entering kernel`
+  - `Kernel: protected mode`
+  - `Kernel: VGA ready`
+  - `Kernel: init complete`
 - Compatibility rule: existing debug-port markers remain unchanged and continue
-	to be emitted alongside any user-visible text.
+  to be emitted alongside any user-visible text.
 
 Exit criteria:
 
