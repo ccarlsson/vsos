@@ -8,7 +8,7 @@ slice and its expected marker contract.
 - `nasm`, `qemu-system-i386`, `make`, `coreutils`
 - Run commands from repository root.
 
-## Canonical Commands (Planned)
+## Canonical Commands
 
 - HI-T1: `make check-hi-t1`
 - HI-T2: `make check-hi-t2`
@@ -27,7 +27,7 @@ files by test scripts.
 - HI-T1 expects: `HI_INIT_OK`
 - HI-T2 expects: `HI_IRQ0_OK`
 - HI-T3 expects: deterministic threshold marker `HI_TICKS_3`
-- HI-T4 expects: no unexpected IRQ marker noise while IRQ0 remains functional
+- HI-T4 expects: `HI_IRQ0_OK` and `HI_TICKS_3`, with no unexpected exception markers
 
 Failure marker for init variants:
 
@@ -54,7 +54,7 @@ Run these after hardware interrupt changes:
 - `make check-vga-all`
 - `make check-all`
 
-## CI Coverage (Target State)
+## CI Coverage
 
 CI should execute:
 
