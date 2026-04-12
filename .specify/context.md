@@ -11,10 +11,10 @@ Goals:
 Tech:
 
 - x86
-- Assembly + C and/or rust
+- Assembly + freestanding C
 - NASM + GCC
 
 Constraints:
 
 - Keep everything simple
-- Each module must be testable independently
+- Each module should stay isolated enough to be tested independently
