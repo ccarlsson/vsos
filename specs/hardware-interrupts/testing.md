@@ -29,15 +29,9 @@ files by test scripts.
 - HI-T3 expects: deterministic threshold marker `HI_TICKS_3`
 - HI-T4 expects: `HI_IRQ0_OK` and `HI_TICKS_3`, with no unexpected exception markers
 
-Failure marker for init variants:
-
-- `HI_INIT_FAIL`
-
 ## Suggested Build/Test Variants
 
 - Default variant: real PIT IRQ0 path with IRQ0 unmasked
-- Negative variant (optional): intentionally broken PIC/PIT init to verify
-  failure marker + halt behavior
 
 ## Phase 0 Locked Runtime Values
 
