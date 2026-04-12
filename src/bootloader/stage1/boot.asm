@@ -40,6 +40,9 @@ start:
     mov al, [boot_drive]
     call print_hex_byte
 
+    mov si, msg_load
+    call print_string
+
     ; Validate fixed config before attempting any disk reads.
     mov ax, KERNEL_SECTOR_COUNT
     cmp ax, 1
@@ -92,6 +95,9 @@ load_loop:
     mov ax, [es:si+2]
     cmp ax, 0x4C4E
     jne disk_error
+
+    mov si, msg_enter
+    call print_string
 
     mov dl, [boot_drive]
     jmp 0x1000:0x0000
@@ -185,8 +191,10 @@ print_string:
 .done:
     ret
 
-msg_boot db 'VSOS M1', 0
+msg_boot db 'VSOS M1', 0x0D, 0x0A, 'Boot: start', 0x0D, 0x0A, 0
 msg_dl db ' DL=', 0
+msg_load db 0x0D, 0x0A, 'Boot: loading kernel', 0x0D, 0x0A, 0
+msg_enter db 0x0D, 0x0A, 'Boot: entering kernel', 0x0D, 0x0A, 0
 msg_disk_err db 'E1', 0
 msg_cfg_err db 'E2', 0
 boot_drive db 0

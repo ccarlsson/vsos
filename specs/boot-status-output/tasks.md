@@ -16,10 +16,10 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Phase 1 - Bootloader Messages
 
-- [ ] Add readable bootloader startup message.
-- [ ] Add readable kernel-loading progress/handoff message.
-- [ ] Keep BIOS teletype path simple and deterministic.
-- [ ] Verify existing debug-port mirror behavior remains intact.
+- [x] Add readable bootloader startup message.
+- [x] Add readable kernel-loading progress/handoff message.
+- [x] Keep BIOS teletype path simple and deterministic.
+- [x] Verify existing debug-port mirror behavior remains intact.
 
 ## Phase 2 - Early Kernel Messages
 
