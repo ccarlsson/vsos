@@ -267,7 +267,10 @@ check-hi-t2: $(DISK_HI_T2_IMG)
 check-hi-t3: $(DISK_HI_T2_IMG)
 	sh tests/hardware-interrupts/scripts/check_qemu_hi_t3.sh $(DISK_HI_T2_IMG)
 
-check-hi-all: check-hi-t1 check-hi-t2 check-hi-t3
+check-hi-t4: $(DISK_HI_T2_IMG)
+	sh tests/hardware-interrupts/scripts/check_qemu_hi_t4.sh $(DISK_HI_T2_IMG)
+
+check-hi-all: check-hi-t1 check-hi-t2 check-hi-t3 check-hi-t4
 
 check-vga-t1: $(DISK_IMG)
 	sh tests/vga-console/scripts/check_qemu_vga_t1.sh $(DISK_IMG)
@@ -299,7 +302,7 @@ check-t4: check-qemu-t4
 
 check-t5: check-qemu-t5
 
-check-all: check-t1 check-qemu-m1 check-t2 check-t3 check-t4 check-t5 check-pm-all check-ih-all check-vga-all
+check-all: check-t1 check-qemu-m1 check-t2 check-t3 check-t4 check-t5 check-pm-all check-ih-all check-hi-all check-vga-all
 
 clean:
 	rm -rf build

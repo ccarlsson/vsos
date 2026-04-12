@@ -34,7 +34,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: bootloader-pm-ih-vga-debug-artifacts
+          name: bootloader-pm-ih-hi-vga-debug-artifacts
           path: |
             build/*.log
             build/*.bin

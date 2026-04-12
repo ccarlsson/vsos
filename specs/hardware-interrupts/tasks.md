@@ -63,37 +63,37 @@ This checklist translates `spec.md` into implementation-ready work.
 - [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t1.sh`.
 - [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t2.sh`.
 - [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t3.sh`.
-- [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t4.sh`.
+- [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t4.sh`.
 
 ### Makefile
 
 - [x] Add `check-hi-t1`, `check-hi-t2`, `check-hi-t3`, `check-hi-t4`.
 - [x] Add aggregate `check-hi-all`.
-- [ ] Include hardware-interrupt suite in `check-all`.
+- [x] Include hardware-interrupt suite in `check-all`.
 
 ### CI and docs
 
-- [ ] Update CI workflow to run `check-hi-all`.
-- [ ] Upload HI debug artifacts on CI failure.
-- [ ] Keep spec/plan/testing docs synchronized with implementation.
+- [x] Update CI workflow to run `check-hi-all`.
+- [x] Upload HI debug artifacts on CI failure.
+- [x] Keep spec/plan/testing docs synchronized with implementation.
 
 ### Validation
 
-- [ ] HI-T4: no unexpected IRQ marker noise with non-IRQ0 lines masked.
-- [ ] Existing suites remain green: boot, PM, IH, VGA, C transition.
+- [x] HI-T4: no unexpected IRQ marker noise with non-IRQ0 lines masked.
+- [x] Existing suites remain green: boot, PM, IH, VGA, C transition.
 
 ## Requirement Traceability Checklist
 
-- [ ] HI-FR-1 satisfied.
-- [ ] HI-FR-2 satisfied.
-- [ ] HI-FR-3 satisfied.
-- [ ] HI-FR-4 satisfied.
-- [ ] HI-FR-5 satisfied.
-- [ ] HI-FR-6 satisfied.
+- [x] HI-FR-1 satisfied.
+- [x] HI-FR-2 satisfied.
+- [x] HI-FR-3 satisfied.
+- [x] HI-FR-4 satisfied.
+- [x] HI-FR-5 satisfied.
+- [x] HI-FR-6 satisfied.
 
 ## Done Criteria
 
-- [ ] HI-T1..HI-T4 pass locally.
-- [ ] `make check-hi-all` available and stable.
-- [ ] CI includes hardware-interrupt checks.
-- [ ] Marker contract is deterministic and documented.
+- [x] HI-T1..HI-T4 pass locally.
+- [x] `make check-hi-all` available and stable.
+- [x] CI includes hardware-interrupt checks.
+- [x] Marker contract is deterministic and documented.
