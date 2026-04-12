@@ -24,9 +24,30 @@ Tasks:
 - Define concise message text for each stage.
 - Lock compatibility rule: debug-port markers remain unchanged.
 
+Locked Phase 0 decisions:
+
+- Visible stages:
+	- bootloader start
+	- kernel loading
+	- kernel handoff
+	- protected-mode entry
+	- VGA ready
+	- early init complete
+- Final message text:
+	- `Boot: start`
+	- `Boot: loading kernel`
+	- `Boot: entering kernel`
+	- `Kernel: protected mode`
+	- `Kernel: VGA ready`
+	- `Kernel: init complete`
+- Compatibility rule: existing debug-port markers remain unchanged and continue
+	to be emitted alongside any user-visible text.
+
 Exit criteria:
 
 - No ambiguity about where messages should appear.
+
+Status: Complete.
 
 ### Phase 1 - Bootloader Messages
 

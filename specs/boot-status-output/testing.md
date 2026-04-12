@@ -18,10 +18,12 @@ make clean && make disk-image && qemu-system-i386 -drive file=build/disk.img,for
 
 Confirm the screen shows readable staged output from:
 
-- bootloader start
-- kernel loading / handoff
-- protected-mode / kernel entry
-- VGA / early kernel progress
+- `Boot: start`
+- `Boot: loading kernel`
+- `Boot: entering kernel`
+- `Kernel: protected mode`
+- `Kernel: VGA ready`
+- `Kernel: init complete`
 
 ## Regression Validation
 

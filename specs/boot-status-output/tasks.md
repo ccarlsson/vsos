@@ -4,9 +4,15 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ## Phase 0 - Design Lock
 
-- [ ] Decide visible stages for bootloader, transition, and kernel bring-up.
-- [ ] Define final short message text for each visible stage.
-- [ ] Lock compatibility rule for existing debug markers.
+- [x] Decide visible stages for bootloader, transition, and kernel bring-up.
+	- `Boot: start`
+	- `Boot: loading kernel`
+	- `Boot: entering kernel`
+	- `Kernel: protected mode`
+	- `Kernel: VGA ready`
+	- `Kernel: init complete`
+- [x] Define final short message text for each visible stage.
+- [x] Lock compatibility rule for existing debug markers.
 
 ## Phase 1 - Bootloader Messages
 

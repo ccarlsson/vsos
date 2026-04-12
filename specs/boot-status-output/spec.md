@@ -64,15 +64,30 @@ Before boot status output begins:
 The bootloader must display short readable status messages for major early boot
 steps, such as startup, validation, kernel loading, and handoff.
 
+Locked v1 bootloader messages:
+
+- `Boot: start`
+- `Boot: loading kernel`
+- `Boot: entering kernel`
+
 ### BSO-FR-2 Protected-Mode Transition Visibility
 
 The kernel transition path must expose at least one visible message indicating
 that control reached protected-mode kernel code.
 
+Locked v1 transition message:
+
+- `Kernel: protected mode`
+
 ### BSO-FR-3 VGA Console Bring-up Visibility
 
 Once VGA output is initialized, the kernel must display readable boot progress
 messages through the VGA console.
+
+Locked v1 VGA-stage messages:
+
+- `Kernel: VGA ready`
+- `Kernel: init complete`
 
 ### BSO-FR-4 Stage Ordering
 
@@ -167,6 +182,15 @@ Acceptance:
 - Protected-mode visibility uses the existing VGA console path.
 - Debug-port markers remain the canonical automated test contract.
 - Messages should be short, stable, and ASCII-only.
+
+Locked v1 visible stage order:
+
+1. `Boot: start`
+2. `Boot: loading kernel`
+3. `Boot: entering kernel`
+4. `Kernel: protected mode`
+5. `Kernel: VGA ready`
+6. `Kernel: init complete`
 
 ## 12. Definition of Done
 
