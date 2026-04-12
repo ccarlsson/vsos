@@ -40,34 +40,34 @@ This checklist translates `spec.md` into implementation-ready work.
 
 ### Handler path
 
-- [ ] Verify IDT vector 0x20 maps to IRQ0 stub.
-- [ ] Increment tick counter in IRQ0 C handler.
-- [ ] Emit `HI_IRQ0_OK` on first observed hardware tick.
-- [ ] Send EOI to master PIC for every IRQ0.
-- [ ] Return with `iret` and keep system alive.
+- [x] Verify IDT vector 0x20 maps to IRQ0 stub.
+- [x] Increment tick counter in IRQ0 C handler.
+- [x] Emit `HI_IRQ0_OK` on first observed hardware tick.
+- [x] Send EOI to master PIC for every IRQ0.
+- [x] Return with `iret` and keep system alive.
 
 ### Deterministic threshold
 
-- [ ] Add bounded tick threshold marker (for example at 3 ticks).
-- [ ] Keep marker output concise and stable across runs.
+- [x] Add bounded tick threshold marker (for example at 3 ticks).
+- [x] Keep marker output concise and stable across runs.
 
 ### Validation
 
-- [ ] HI-T2: first hardware tick detected (`HI_IRQ0_OK`).
-- [ ] HI-T3: threshold tick marker observed.
+- [x] HI-T2: first hardware tick detected (`HI_IRQ0_OK`).
+- [x] HI-T3: threshold tick marker observed.
 
 ## Phase 3 - Test Automation and Workflow
 
 ### Scripts
 
 - [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t1.sh`.
-- [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t2.sh`.
-- [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t3.sh`.
+- [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t2.sh`.
+- [x] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t3.sh`.
 - [ ] Add `tests/hardware-interrupts/scripts/check_qemu_hi_t4.sh`.
 
 ### Makefile
 
-- [ ] Add `check-hi-t1`, `check-hi-t2`, `check-hi-t3`, `check-hi-t4`.
+- [x] Add `check-hi-t1`, `check-hi-t2`, `check-hi-t3`, `check-hi-t4`.
 - [x] Add aggregate `check-hi-all`.
 - [ ] Include hardware-interrupt suite in `check-all`.
 

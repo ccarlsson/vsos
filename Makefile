@@ -43,8 +43,12 @@ DISK_PM_T3_IMG := build/disk-pm-t3.img
 DISK_IH_T2_IMG := build/disk-ih-t2.img
 DISK_IH_T3_IMG := build/disk-ih-t3.img
 DISK_IH_T4_IMG := build/disk-ih-t4.img
+KERNEL_HI_T2_BIN := build/kernel.hi.t2.bin
+KERNEL_HI_T2_ELF := build/kernel.hi.t2.elf
+KERNEL_HI_T2_ASM_OBJ := build/kernel.hi.t2.stage0.o
+DISK_HI_T2_IMG := build/disk-hi-t2.img
 
-.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-t2 check-hi-t3 check-hi-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -180,6 +184,24 @@ $(DISK_IH_T4_IMG): $(BOOT_BIN) $(KERNEL_IH_MULTI_BIN)
 	dd if=$(BOOT_BIN) of=$(DISK_IH_T4_IMG) conv=notrunc status=none
 	dd if=$(KERNEL_IH_MULTI_BIN) of=$(DISK_IH_T4_IMG) bs=512 seek=1 conv=notrunc status=none
 
+$(KERNEL_HI_T2_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DHARDWARE_IRQ_TEST_MODE=1 -o $(KERNEL_HI_T2_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_HI_T2_ELF): $(KERNEL_HI_T2_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_HI_T2_ELF) $(KERNEL_HI_T2_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_HI_T2_BIN): $(KERNEL_HI_T2_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_HI_T2_ELF) $(KERNEL_HI_T2_BIN)
+
+$(DISK_HI_T2_IMG): $(BOOT_BIN) $(KERNEL_HI_T2_BIN)
+	mkdir -p build
+	dd if=/dev/zero of=$(DISK_HI_T2_IMG) bs=512 count=2880 status=none
+	dd if=$(BOOT_BIN) of=$(DISK_HI_T2_IMG) conv=notrunc status=none
+	dd if=$(KERNEL_HI_T2_BIN) of=$(DISK_HI_T2_IMG) bs=512 seek=1 conv=notrunc status=none
+
 disk-image: $(DISK_IMG)
 
 check-c-toolchain:
@@ -239,7 +261,13 @@ check-ih-all: check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4
 check-hi-t1: $(DISK_IMG)
 	sh tests/hardware-interrupts/scripts/check_qemu_hi_t1.sh $(DISK_IMG)
 
-check-hi-all: check-hi-t1
+check-hi-t2: $(DISK_HI_T2_IMG)
+	sh tests/hardware-interrupts/scripts/check_qemu_hi_t2.sh $(DISK_HI_T2_IMG)
+
+check-hi-t3: $(DISK_HI_T2_IMG)
+	sh tests/hardware-interrupts/scripts/check_qemu_hi_t3.sh $(DISK_HI_T2_IMG)
+
+check-hi-all: check-hi-t1 check-hi-t2 check-hi-t3
 
 check-vga-t1: $(DISK_IMG)
 	sh tests/vga-console/scripts/check_qemu_vga_t1.sh $(DISK_IMG)

@@ -24,10 +24,13 @@ typedef unsigned int u32;
 #define PIT_COMMAND_RATE_GEN_LOHI 0x34u
 #define PIT_DIVISOR_100HZ 11931u
 
+#define PIC_EOI 0x20u
+
 extern void debug_print_pm(const char *message);
 
 extern u8 ih_seen;
 extern u8 ih_count;
+extern u8 hi_hw_tick_count;
 extern u8 last_exc_vector;
 extern u32 last_exc_error;
 extern u32 last_exc_eip;
@@ -99,9 +102,17 @@ void init_hw_interrupts_c(void)
 
 void ih_handle_timer_c(void)
 {
+    hi_hw_tick_count++;
     ih_seen = 1;
     ih_count++;
+    if (hi_hw_tick_count == 1u) {
+        debug_print_pm(" HI_IRQ0_OK");
+    }
+    if (hi_hw_tick_count == 3u) {
+        debug_print_pm(" HI_TICKS_3");
+    }
     debug_print_pm(" IH_OK");
+    outb(PIC1_COMMAND_PORT, PIC_EOI);
 }
 
 void ih_handle_exception_c(u32 vector, u32 error, u32 eip)
