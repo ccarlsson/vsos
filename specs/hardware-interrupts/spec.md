@@ -105,8 +105,9 @@ markers:
 
 ### HI-FR-6 Safe Failure Behavior
 
-If PIC/PIT init invariants fail in test variants, kernel must emit a distinct
-failure marker (`HI_INIT_FAIL`) and halt in `cli` + `hlt` loop.
+No dedicated PIC/PIT init failure marker path is required in v1.
+This module relies on deterministic, locked init constants and validates
+runtime behavior through `HI_INIT_OK`, `HI_IRQ0_OK`, and `HI_TICKS_3`.
 
 ## 7. Non-Functional Requirements
 
@@ -198,8 +199,8 @@ Acceptance:
 - IRQ masks after init: master=0xFE (IRQ0 unmasked), slave=0xFF (all masked).
 - PIT configuration: command=0x34, divisor=11931 (~100 Hz).
 - Test strategy: debug-port markers captured in QEMU log.
-- Marker contract: `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`; failure marker `HI_INIT_FAIL`.
-- Failure strategy: marker + `cli` + `hlt` loop.
+- Marker contract: `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`.
+- Existing fatal paths retain `cli` + `hlt` loop behavior.
 
 ## 12. Definition of Done
 

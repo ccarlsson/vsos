@@ -10,7 +10,7 @@ This checklist translates `spec.md` into implementation-ready work.
 - [x] Confirm and document PIT target frequency/divisor.
   - PIT command = 0x34, divisor = 11931 (~100 Hz)
 - [x] Lock marker strings and test thresholds.
-  - `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`, `HI_INIT_FAIL`
+  - `HI_INIT_OK`, `HI_IRQ0_OK`, `HI_TICKS_3`
 
 ## Phase 1 - PIC/PIT Bring-up (HI-M1)
 
