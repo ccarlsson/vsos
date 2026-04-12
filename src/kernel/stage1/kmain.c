@@ -3,20 +3,28 @@
 extern void debug_print_pm(const char *message);
 extern void pm_main(void);
 
+static void show_boot_status(void)
+{
+    vga_write("Kernel: protected mode\n");
+    vga_write("Kernel: VGA ready\n");
+    vga_write("Kernel: init complete\n");
+}
+
 void kmain(void)
 {
     debug_print_pm(" C_ENTRY_OK");
 
     vga_init();
+    show_boot_status();
     debug_print_pm(" VGA_INIT_OK");
 
-    vga_putc('A');
+    vga_putc(' ');
     debug_print_pm(" VGA_CHAR_OK");
 
-    vga_write("HELLO");
+    vga_write("Kernel: VGA ready\n");
     debug_print_pm(" VGA_STR_OK");
 
-    vga_write("LINE1\nLINE2");
+    vga_write("Kernel: init complete\n");
     debug_print_pm(" VGA_NL_OK");
 
     {
@@ -30,10 +38,13 @@ void kmain(void)
     {
         int i;
         for (i = 0; i < 30; i++) {
-            vga_write("L\n");
+            vga_write(" \n");
         }
     }
     debug_print_pm(" VGA_SCROLL_OK");
+
+    vga_init();
+    show_boot_status();
 
     pm_main();
 }

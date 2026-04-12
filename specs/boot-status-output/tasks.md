@@ -1,0 +1,50 @@
+# Boot Status Output Task List
+
+This checklist translates `spec.md` into implementation-ready work.
+
+## Phase 0 - Design Lock
+
+- [x] Decide visible stages for bootloader, transition, and kernel bring-up.
+  - `Boot: start`
+  - `Boot: loading kernel`
+  - `Boot: entering kernel`
+  - `Kernel: protected mode`
+  - `Kernel: VGA ready`
+  - `Kernel: init complete`
+- [x] Define final short message text for each visible stage.
+- [x] Lock compatibility rule for existing debug markers.
+
+## Phase 1 - Bootloader Messages
+
+- [x] Add readable bootloader startup message.
+- [x] Add readable kernel-loading progress/handoff message.
+- [x] Keep BIOS teletype path simple and deterministic.
+- [x] Verify existing debug-port mirror behavior remains intact.
+
+## Phase 2 - Early Kernel Messages
+
+- [x] Add protected-mode / kernel entry message visible to the user.
+- [x] Add readable VGA-init / early-kernel progress text.
+- [x] Replace current non-user-facing visible test output where appropriate.
+- [x] Keep debug markers unchanged for automation.
+
+## Phase 3 - Validation and Regression
+
+- [x] Validate visible message order in QEMU.
+- [x] Run existing automated suites.
+- [x] Update docs if visible stage text changes from initial draft.
+
+## Requirement Traceability Checklist
+
+- [x] BSO-FR-1 satisfied.
+- [x] BSO-FR-2 satisfied.
+- [x] BSO-FR-3 satisfied.
+- [x] BSO-FR-4 satisfied.
+- [x] BSO-FR-5 satisfied.
+- [x] BSO-FR-6 satisfied.
+
+## Done Criteria
+
+- [x] Human-readable boot messages visible from bootloader through early kernel.
+- [x] Existing automated tests still pass.
+- [x] Visible output remains short, clear, and deterministic.
