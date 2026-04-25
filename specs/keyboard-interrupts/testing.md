@@ -50,6 +50,7 @@ input/monitor facilities.
 Recommended contract:
 
 - Inject key: `a`
+- Wait until keyboard init and timer-liveness markers are present before sending the key
 - Assert raw make code behavior, not rich terminal semantics
 - Keep the test harness headless and bounded by timeout
 
