@@ -47,8 +47,12 @@ KERNEL_HI_T2_BIN := build/kernel.hi.t2.bin
 KERNEL_HI_T2_ELF := build/kernel.hi.t2.elf
 KERNEL_HI_T2_ASM_OBJ := build/kernel.hi.t2.stage0.o
 DISK_HI_T2_IMG := build/disk-hi-t2.img
+KERNEL_KBD_BIN := build/kernel.kbd.bin
+KERNEL_KBD_ELF := build/kernel.kbd.elf
+KERNEL_KBD_ASM_OBJ := build/kernel.kbd.stage0.o
+DISK_KBD_IMG := build/disk-kbd.img
 
-.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-t2 check-hi-t3 check-hi-t4 check-hi-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
+.PHONY: all clean check-c-toolchain check-c-t1 check-boot check-qemu-m1 disk-image check-qemu-m2 check-qemu-t5 check-qemu-t3 check-qemu-t4 check-pm-t1 check-pm-t2 check-pm-t3 check-pm-all check-ih-t1 check-ih-t2 check-ih-t3 check-ih-t4 check-ih-all check-hi-t1 check-hi-t2 check-hi-t3 check-hi-t4 check-hi-all check-kbd-t1 check-kbd-t2 check-kbd-t3 check-kbd-t4 check-kbd-all check-vga-t1 check-vga-t2 check-vga-t3 check-vga-t4 check-vga-t5 check-vga-t6 check-vga-all check-t1 check-t2 check-t3 check-t4 check-t5 check-all
 
 all: $(BOOT_BIN) $(KERNEL_BIN)
 
@@ -202,6 +206,24 @@ $(DISK_HI_T2_IMG): $(BOOT_BIN) $(KERNEL_HI_T2_BIN)
 	dd if=$(BOOT_BIN) of=$(DISK_HI_T2_IMG) conv=notrunc status=none
 	dd if=$(KERNEL_HI_T2_BIN) of=$(DISK_HI_T2_IMG) bs=512 seek=1 conv=notrunc status=none
 
+$(KERNEL_KBD_ASM_OBJ): $(KERNEL_SRC)
+	mkdir -p build
+	nasm -f elf32 -DKEYBOARD_IRQ_TEST_MODE=1 -o $(KERNEL_KBD_ASM_OBJ) $(KERNEL_SRC)
+
+$(KERNEL_KBD_ELF): $(KERNEL_KBD_ASM_OBJ) $(KERNEL_C_OBJS) $(KERNEL_LD_SCRIPT)
+	mkdir -p build
+	$(LD32) $(LD32_FLAGS) -o $(KERNEL_KBD_ELF) $(KERNEL_KBD_ASM_OBJ) $(KERNEL_C_OBJS)
+
+$(KERNEL_KBD_BIN): $(KERNEL_KBD_ELF)
+	mkdir -p build
+	$(OBJCOPY) -O binary $(KERNEL_KBD_ELF) $(KERNEL_KBD_BIN)
+
+$(DISK_KBD_IMG): $(BOOT_BIN) $(KERNEL_KBD_BIN)
+	mkdir -p build
+	dd if=/dev/zero of=$(DISK_KBD_IMG) bs=512 count=2880 status=none
+	dd if=$(BOOT_BIN) of=$(DISK_KBD_IMG) conv=notrunc status=none
+	dd if=$(KERNEL_KBD_BIN) of=$(DISK_KBD_IMG) bs=512 seek=1 conv=notrunc status=none
+
 disk-image: $(DISK_IMG)
 
 check-c-toolchain:
@@ -272,6 +294,20 @@ check-hi-t4: $(DISK_HI_T2_IMG)
 
 check-hi-all: check-hi-t1 check-hi-t2 check-hi-t3 check-hi-t4
 
+check-kbd-t1: $(DISK_KBD_IMG)
+	bash tests/keyboard-interrupts/scripts/check_qemu_kbd_t1.sh $(DISK_KBD_IMG)
+
+check-kbd-t2: $(DISK_KBD_IMG)
+	bash tests/keyboard-interrupts/scripts/check_qemu_kbd_t2.sh $(DISK_KBD_IMG)
+
+check-kbd-t3: $(DISK_KBD_IMG)
+	bash tests/keyboard-interrupts/scripts/check_qemu_kbd_t3.sh $(DISK_KBD_IMG)
+
+check-kbd-t4: $(DISK_KBD_IMG)
+	bash tests/keyboard-interrupts/scripts/check_qemu_kbd_t4.sh $(DISK_KBD_IMG)
+
+check-kbd-all: check-kbd-t1 check-kbd-t2 check-kbd-t3 check-kbd-t4
+
 check-vga-t1: $(DISK_IMG)
 	sh tests/vga-console/scripts/check_qemu_vga_t1.sh $(DISK_IMG)
 
@@ -302,7 +338,7 @@ check-t4: check-qemu-t4
 
 check-t5: check-qemu-t5
 
-check-all: check-t1 check-qemu-m1 check-t2 check-t3 check-t4 check-t5 check-pm-all check-ih-all check-hi-all check-vga-all
+check-all: check-t1 check-qemu-m1 check-t2 check-t3 check-t4 check-t5 check-pm-all check-ih-all check-hi-all check-kbd-all check-vga-all
 
 clean:
 	rm -rf build

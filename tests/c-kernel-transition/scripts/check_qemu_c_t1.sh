@@ -2,11 +2,12 @@
 set -eu
 
 DISK_IMAGE="$1"
+TIMEOUT_SECONDS="${QEMU_TIMEOUT_SECONDS:-3}"
 LOG_FILE="build/qemu-c-t1-debug.log"
 
 rm -f "$LOG_FILE"
 
-qemu-system-i386 \
+timeout -k 1s "${TIMEOUT_SECONDS}s" qemu-system-i386 \
     -drive format=raw,file="$DISK_IMAGE",if=floppy \
     -boot a \
     -nographic \

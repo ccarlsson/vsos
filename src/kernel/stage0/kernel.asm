@@ -32,12 +32,17 @@ IDT_LIMIT equ (IDT_ENTRY_COUNT * 8) - 1
 %define HARDWARE_IRQ_TEST_MODE 0
 %endif
 
+%ifndef KEYBOARD_IRQ_TEST_MODE
+%define KEYBOARD_IRQ_TEST_MODE 0
+%endif
+
 %define RM_OFF(sym) (sym - kernel_image_start)
 
 extern kmain
 extern init_idt_c
 extern init_hw_interrupts_c
 extern ih_handle_timer_c
+extern ih_handle_keyboard_c
 extern ih_handle_exception_c
 
 global kernel_image_start
@@ -48,9 +53,14 @@ global idt_start
 global idtr
 global isr_default_stub
 global isr_timer_stub
+global isr_keyboard_stub
 global isr_exc0_stub
 global isr_exc6_stub
 global isr_exc13_stub
+global keyboard_irq_test_mode
+global kbd_irq_seen
+global kbd_scancode_match
+global last_kbd_scancode
 global ih_seen
 global ih_count
 global hi_hw_tick_count
@@ -274,6 +284,10 @@ gdtr:
     dd gdt_start
 
 align 4
+keyboard_irq_test_mode db KEYBOARD_IRQ_TEST_MODE
+kbd_irq_seen db 0
+kbd_scancode_match db 0
+last_kbd_scancode db 0
 ih_seen db 0
 ih_count db 0
 hi_hw_tick_count db 0
@@ -312,7 +326,14 @@ pm_main:
     call init_hw_interrupts_c
     sti
 
-%if HARDWARE_IRQ_TEST_MODE = 1
+%if KEYBOARD_IRQ_TEST_MODE = 1
+.wait_keyboard:
+    hlt
+    cmp byte [hi_hw_tick_count], 3
+    jb .wait_keyboard
+    cmp byte [kbd_scancode_match], 1
+    jb .wait_keyboard
+%elif HARDWARE_IRQ_TEST_MODE = 1
 .wait_ticks:
     hlt
     cmp byte [hi_hw_tick_count], 3
@@ -352,6 +373,12 @@ isr_default_stub:
 isr_timer_stub:
     pushad
     call ih_handle_timer_c
+    popad
+    iret
+
+isr_keyboard_stub:
+    pushad
+    call ih_handle_keyboard_c
     popad
     iret
 

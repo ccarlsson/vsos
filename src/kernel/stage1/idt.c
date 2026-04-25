@@ -11,6 +11,7 @@ typedef unsigned long long u64;
 
 extern void isr_default_stub(void);
 extern void isr_timer_stub(void);
+extern void isr_keyboard_stub(void);
 extern void isr_exc0_stub(void);
 extern void isr_exc6_stub(void);
 extern void isr_exc13_stub(void);
@@ -50,6 +51,7 @@ void init_idt_c(void)
     }
 
     idt_set_gate(0x20u, isr_timer_stub);
+    idt_set_gate(0x21u, isr_keyboard_stub);
     idt_set_gate(0x00u, isr_exc0_stub);
     idt_set_gate(0x06u, isr_exc6_stub);
     idt_set_gate(0x0Du, isr_exc13_stub);

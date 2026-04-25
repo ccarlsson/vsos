@@ -25,7 +25,7 @@ jobs:
       - name: Run C transition toolchain probe
         run: make check-c-toolchain
 
-      - name: Run bootloader, PM, IH, and VGA validation suites
+      - name: Run bootloader, PM, IH, HI, KBD, and VGA validation suites
         env:
           QEMU_TIMEOUT_SECONDS: "5"
         run: make check-all
@@ -34,7 +34,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: bootloader-pm-ih-hi-vga-debug-artifacts
+          name: bootloader-pm-ih-hi-kbd-vga-debug-artifacts
           path: |
             build/*.log
             build/*.bin
