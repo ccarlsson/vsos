@@ -21,7 +21,31 @@ send_monitor_command() {
     local monitor_port="$1"
     local command_text="$2"
 
-    bash -c "exec 3<>/dev/tcp/127.0.0.1/${monitor_port}; printf '%s\r\n' '${command_text}' >&3; exec 3>&-; exec 3<&-" >/dev/null 2>&1
+    bash -c '
+        cmd="$1"
+        port="$2"
+
+        exec 3<>"/dev/tcp/127.0.0.1/${port}"
+        IFS= read -r -t 0.2 _ <&3 || true
+        printf "%s\r\n" "$cmd" >&3
+        sleep 0.2
+        exec 3>&-
+        exec 3<&-
+    ' bash "$command_text" "$monitor_port" >/dev/null 2>&1
+}
+
+wait_for_monitor_ready() {
+    local monitor_port="$1"
+    local attempt
+
+    for attempt in $(seq 1 20); do
+        if bash -c 'port="$1"; exec 3<>"/dev/tcp/127.0.0.1/${port}"; sleep 0.1; exec 3>&-; exec 3<&-' bash "$monitor_port" >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 0.1
+    done
+
+    return 1
 }
 
 wait_for_keyboard_ready() {
@@ -37,17 +61,17 @@ send_key_when_ready() {
     local expected_marker="$3"
     local attempt
 
-    if ! wait_for_keyboard_ready "$log_file"; then
+    if ! wait_for_keyboard_ready "$log_file" || ! wait_for_monitor_ready "$monitor_port"; then
         return 1
     fi
 
-    for attempt in 1 2 3; do
+    for attempt in 1 2 3 4 5; do
         if send_monitor_command "$monitor_port" 'sendkey a'; then
-            if wait_for_log_marker "$log_file" "$expected_marker" 10 0.1; then
+            if wait_for_log_marker "$log_file" "$expected_marker" 15 0.1; then
                 return 0
             fi
         fi
-        sleep 0.2
+        sleep 0.3
     done
 
     return 1
