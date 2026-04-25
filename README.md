@@ -43,6 +43,8 @@ Current kernel structure:
 - `specs/c-kernel-transition/`: mixed asm + C kernel transition spec, plan, tasks, and testing documentation
 - `specs/protected-mode/`: protected-mode spec, plan, tasks, and testing documentation
 - `specs/interrupt-handling/`: interrupt handling spec, plan, tasks, and testing documentation
+- `specs/hardware-interrupts/`: hardware interrupts spec, plan, tasks, and testing documentation
+- `specs/keyboard-interrupts/`: keyboard interrupts spec, plan, tasks, and testing documentation
 - `specs/vga-console/`: VGA console spec, plan, tasks, and testing documentation
 - `specs/kernel-loading/`: kernel loading specs
 - `build/`: generated binaries, images, and debug logs (ignored)
@@ -190,6 +192,20 @@ Complete documentation organized by phase:
 - `specs/interrupt-handling/plan.md`
 - `specs/interrupt-handling/tasks.md`
 - `specs/interrupt-handling/testing.md`
+
+**Hardware Interrupts:**
+
+- `specs/hardware-interrupts/spec.md`
+- `specs/hardware-interrupts/plan.md`
+- `specs/hardware-interrupts/tasks.md`
+- `specs/hardware-interrupts/testing.md`
+
+**Keyboard Interrupts:**
+
+- `specs/keyboard-interrupts/spec.md`
+- `specs/keyboard-interrupts/plan.md`
+- `specs/keyboard-interrupts/tasks.md`
+- `specs/keyboard-interrupts/testing.md`
 
 **Kernel Loading:**
 
