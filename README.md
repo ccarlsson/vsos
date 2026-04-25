@@ -19,6 +19,8 @@ Implemented and validated:
 - Bootloader tests T-1 through T-5
 - Protected-mode tests PM-T-1 through PM-T-3
 - Interrupt-handling tests IH-T-1 through IH-T-4
+- Hardware interrupt tests HI-T-1 through HI-T-4
+- Keyboard interrupt tests KBD-T-1 through KBD-T-4
 - VGA console tests VGA-T-1 through VGA-T-6
 - C kernel transition phases 1 through 3
 
@@ -37,6 +39,8 @@ Current kernel structure:
 - `tests/bootloader/scripts/`: bootloader validation scripts (T-1..T-5)
 - `tests/protected-mode/scripts/`: protected-mode validation scripts (PM-T-1..PM-T-3)
 - `tests/interrupt-handling/scripts/`: interrupt handling validation scripts (IH-T-1..IH-T-4)
+- `tests/hardware-interrupts/scripts/`: hardware interrupt validation scripts (HI-T-1..HI-T-4)
+- `tests/keyboard-interrupts/scripts/`: keyboard interrupt validation scripts (KBD-T-1..KBD-T-4)
 - `tests/vga-console/scripts/`: VGA console validation scripts (VGA-T-1..VGA-T-6)
 - `tests/c-kernel-transition/scripts/`: mixed-language kernel transition checks
 - `specs/bootloader/`: bootloader spec, plan, tasks, and testing documentation
@@ -84,6 +88,8 @@ Run focused subsystem suites:
 ```sh
 make check-pm-all
 make check-ih-all
+make check-hi-all
+make check-kbd-all
 make check-vga-all
 make check-c-t1
 ```
@@ -104,6 +110,14 @@ make check-ih-t1
 make check-ih-t2
 make check-ih-t3
 make check-ih-t4
+make check-hi-t1
+make check-hi-t2
+make check-hi-t3
+make check-hi-t4
+make check-kbd-t1
+make check-kbd-t2
+make check-kbd-t3
+make check-kbd-t4
 make check-vga-t1
 make check-vga-t2
 make check-vga-t3
@@ -133,6 +147,8 @@ Debug logs:
 - Bootloader: `build/qemu-debug.log`, `build/qemu-m2-debug.log`, `build/qemu-t3-debug.log`, `build/qemu-t4-debug.log`, `build/qemu-t5-debug.log`
 - Protected-mode: `build/qemu-pm-t1-debug.log`, `build/qemu-pm-t2-debug.log`, `build/qemu-pm-t3-debug.log`
 - Interrupt handling: `build/qemu-ih-t1-debug.log`, `build/qemu-ih-t2-debug.log`, `build/qemu-ih-t3-debug.log`, `build/qemu-ih-t4-debug.log`
+- Hardware interrupts: `build/qemu-hi-t1-debug.log`, `build/qemu-hi-t2-debug.log`, `build/qemu-hi-t3-debug.log`, `build/qemu-hi-t4-debug.log`
+- Keyboard interrupts: `build/qemu-kbd-t1-debug.log`, `build/qemu-kbd-t2-debug.log`, `build/qemu-kbd-t3-debug.log`, `build/qemu-kbd-t4-debug.log`
 - VGA console: `build/qemu-vga-t1-debug.log`, `build/qemu-vga-t2-debug.log`, `build/qemu-vga-t3-debug.log`, `build/qemu-vga-t4-debug.log`, `build/qemu-vga-t5-debug.log`, `build/qemu-vga-t6-debug.log`
 - C transition: `build/qemu-c-t1-debug.log`
 
